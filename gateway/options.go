@@ -320,7 +320,7 @@ func OptionRegisterExactInterceptor(path string, f InterceptorFunc) Option {
 
 // OptionRegisterInterceptor registers a given InterceptorFunc/ It will always
 // be executed before all other kind of interceptors.
-func OptionRegisterInterceptor(path string, f InterceptorFunc) Option {
+func OptionRegisterInterceptor(f InterceptorFunc) Option {
 	return func(cfg *gwconfig) {
 		cfg.interceptors = append(cfg.interceptors, f)
 	}
