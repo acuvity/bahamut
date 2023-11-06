@@ -388,6 +388,22 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var interceptAction InterceptorAction
 	var err error
 
+	for _, interceptor := range s.gatewayConfig.interceptors {
+		interceptAction, upstream, err = interceptor(w, r, writeError, func() {
+			injectCORSHeader(
+				w.Header(),
+				s.gatewayConfig.corsOrigin,
+				s.gatewayConfig.additionalCorsOrigin,
+				s.gatewayConfig.corsAllowCredentials,
+				r.Header.Get("origin"),
+				r.Method,
+			)
+		})
+		if interceptAction != 0 {
+			goto HANDLE_INTERCEPTION
+		}
+
+	}
 	// First we look for the exact match
 	if interceptAction, upstream, err = s.checkInterceptor(
 		s.gatewayConfig.exactInterceptors,

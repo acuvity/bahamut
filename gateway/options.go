@@ -75,6 +75,7 @@ type gwconfig struct {
 	responseRewriter                   ResponseRewriter
 	prefixInterceptors                 map[string]InterceptorFunc
 	suffixInterceptors                 map[string]InterceptorFunc
+	interceptors                       []InterceptorFunc
 	corsOrigin                         string
 	proxyProtocolSubnet                string
 	upstreamCircuitBreakerCond         string
@@ -314,6 +315,14 @@ func OptionRegisterSuffixInterceptor(prefix string, f InterceptorFunc) Option {
 func OptionRegisterExactInterceptor(path string, f InterceptorFunc) Option {
 	return func(cfg *gwconfig) {
 		cfg.exactInterceptors[path] = f
+	}
+}
+
+// OptionRegisterInterceptor registers a given InterceptorFunc/ It will always
+// be executed before all other kind of interceptors.
+func OptionRegisterInterceptor(path string, f InterceptorFunc) Option {
+	return func(cfg *gwconfig) {
+		cfg.interceptors = append(cfg.interceptors, f)
 	}
 }
 
