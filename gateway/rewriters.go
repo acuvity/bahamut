@@ -3,13 +3,13 @@ package gateway
 import (
 	"encoding/pem"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 
 	"go.aporeto.io/tg/tglib"
-	"go.uber.org/zap"
 )
 
 const internalWSMarkingHeader = "__internal_ws__"
@@ -25,7 +25,7 @@ func (s *requestRewriter) Rewrite(r *httputil.ProxyRequest) {
 
 	if s.customRewriter != nil {
 		if err := s.customRewriter(r, s.private); err != nil {
-			zap.L().Error("Unable rewrite request with custom rewriter", zap.Error(err))
+			slog.Error("Unable rewrite request with custom rewriter", err)
 			panic(fmt.Sprintf("unable to rewrite request with custom rewriter: %s", err)) // panic are recovered from oxy
 		}
 	}
@@ -71,7 +71,7 @@ func (s *requestRewriter) Rewrite(r *httputil.ProxyRequest) {
 
 		block, err := tglib.CertToPEM(r.In.TLS.PeerCertificates[0])
 		if err != nil {
-			zap.L().Error("Unable to handle client TLS certificate", zap.Error(err))
+			slog.Error("Unable to handle client TLS certificate", err)
 			panic(fmt.Sprintf("unable to handle client TLS certificate: %s", err)) // panic are recovered from oxy
 		}
 

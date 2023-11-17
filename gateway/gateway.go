@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 
@@ -20,7 +22,6 @@ import (
 	"github.com/vulcand/oxy/v2/forward"
 	"github.com/vulcand/oxy/v2/utils"
 	"go.aporeto.io/bahamut"
-	"go.uber.org/zap"
 )
 
 // An gateway is cool
@@ -97,10 +98,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 	var serverLogger *log.Logger
 	if !cfg.trace {
-		serverLogger, err = zap.NewStdLogAt(zap.L(), zap.DebugLevel)
-		if err != nil {
-			return nil, fmt.Errorf("unable create zap std logger: %s", err)
-		}
+		serverLogger = slog.NewLogLogger(slog.Default().Handler(), slog.LevelDebug)
 	}
 
 	s := &gateway{
@@ -266,7 +264,8 @@ func (s *gateway) Start() {
 			if err == http.ErrServerClosed {
 				return
 			}
-			zap.L().Fatal("Unable to start internal API server", zap.Error(err))
+			slog.Error("Unable to start internal API server", err)
+			os.Exit(1)
 		}
 	}()
 }
@@ -279,9 +278,9 @@ func (s *gateway) Stop() {
 	go func() {
 		defer cancel()
 		if err := s.server.Shutdown(stopCtx); err != nil {
-			zap.L().Error("Could not gracefully stop internal API server", zap.Error(err))
+			slog.Error("Could not gracefully stop internal API server", err)
 		} else {
-			zap.L().Debug("Internet API server stopped")
+			slog.Debug("Internet API server stopped")
 		}
 	}()
 
@@ -291,7 +290,7 @@ func (s *gateway) Stop() {
 	// to connection timeout, with mostly no chance of retrying.
 	// This server makes sure we return immediately with a retryable error.
 	go func() {
-		zap.L().Info("Starting temporary redirect server...")
+		slog.Info("Starting temporary redirect server...")
 		for {
 			if err := s.goodbyeServer.ListenAndServeTLS("", ""); err != nil {
 				if strings.Contains(err.Error(), "address already in use") {
@@ -300,7 +299,7 @@ func (s *gateway) Stop() {
 				if err == http.ErrServerClosed {
 					return
 				}
-				zap.L().Error("Unable to start temporary redirect server", zap.Error(err))
+				slog.Error("Unable to start temporary redirect server", err)
 				return
 			}
 		}
@@ -311,9 +310,9 @@ func (s *gateway) Stop() {
 	stopCtx, cancel = context.WithTimeout(context.Background(), 1*time.Second)
 	go func() {
 		defer cancel()
-		zap.L().Info("Stopping temporary redirect server...")
+		slog.Info("Stopping temporary redirect server...")
 		if err := s.goodbyeServer.Shutdown(stopCtx); err != nil {
-			zap.L().Error("Could not gracefully stop temp server", zap.Error(err))
+			slog.Error("Could not gracefully stop temp server", err)
 		}
 	}()
 
@@ -468,15 +467,15 @@ HANDLE_INTERCEPTION:
 
 			default:
 
-				zap.L().Error("Upstreamer error",
-					zap.String("ip", r.RemoteAddr),
-					zap.String("method", r.Method),
-					zap.String("proto", r.Proto),
-					zap.String("path", r.URL.Path),
-					zap.String("ns", r.Header.Get("X-Namespace")),
-					zap.String("routed", upstream),
-					zap.String("scheme", s.gatewayConfig.upstreamURLScheme),
-					zap.Error(err),
+				slog.Error("Upstreamer error",
+					"ip", r.RemoteAddr,
+					"method", r.Method,
+					"proto", r.Proto,
+					"path", r.URL.Path,
+					"ns", r.Header.Get("X-Namespace"),
+					"routed", upstream,
+					"scheme", s.gatewayConfig.upstreamURLScheme,
+					err,
 				)
 
 				s.corsOriginInjectorFunc(w, r)
@@ -493,14 +492,14 @@ HANDLE_INTERCEPTION:
 		}
 	}
 
-	zap.L().Debug("request",
-		zap.String("ip", r.RemoteAddr),
-		zap.String("method", r.Method),
-		zap.String("proto", r.Proto),
-		zap.String("path", r.URL.Path),
-		zap.String("ns", r.Header.Get("X-Namespace")),
-		zap.String("routed", upstream),
-		zap.String("scheme", s.gatewayConfig.upstreamURLScheme),
+	slog.Debug("request",
+		"ip", r.RemoteAddr,
+		"method", r.Method,
+		"proto", r.Proto,
+		"path", r.URL.Path,
+		"ns", r.Header.Get("X-Namespace"),
+		"routed", upstream,
+		"scheme", s.gatewayConfig.upstreamURLScheme,
 	)
 
 	r.URL.Host = upstream

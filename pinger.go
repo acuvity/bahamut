@@ -12,10 +12,9 @@
 package bahamut
 
 import (
+	"log/slog"
 	"sync"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 const (
@@ -49,11 +48,11 @@ func RetrieveHealthStatus(timeout time.Duration, pingers map[string]Pinger) erro
 			status := stringifyStatus(err)
 			duration := time.Since(start)
 
-			zap.L().Info("Ping",
-				zap.String("service", name),
-				zap.String("status", status),
-				zap.String("duration", duration.String()),
-				zap.Error(err),
+			slog.Info("Ping",
+				"service", name,
+				"status", status,
+				"duration", duration.String(),
+				err,
 			)
 
 			m.Lock()

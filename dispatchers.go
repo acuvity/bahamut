@@ -13,10 +13,10 @@ package bahamut
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"go.aporeto.io/elemental"
-	"go.uber.org/zap"
 )
 
 func audit(auditer Auditer, ctx *bcontext, err error) {
@@ -508,13 +508,14 @@ func makeReadOnlyError(identity elemental.Identity, readOnlyExclusion []elementa
 
 func logValidationError(ctx *bcontext, err error) {
 
-	zap.L().Debug("Validation error",
-		zap.String("operation", string(ctx.request.Operation)),
-		zap.String("clientIP", ctx.request.ClientIP),
-		zap.Strings("claims", ctx.claims),
-		zap.String("namespace", ctx.request.Namespace),
-		zap.String("objectID", ctx.request.ObjectID),
-		zap.String("identity", ctx.request.Identity.Name),
-		zap.String("parentIdentity", ctx.request.ParentIdentity.Name),
-		zap.Error(err))
+	slog.Debug("Validation error",
+		"operation", ctx.request.Operation,
+		"clientIP", ctx.request.ClientIP,
+		"claims", ctx.claims,
+		"namespace", ctx.request.Namespace,
+		"objectID", ctx.request.ObjectID,
+		"identity", ctx.request.Identity.Name,
+		"parentIdentity", ctx.request.ParentIdentity.Name,
+		err,
+	)
 }

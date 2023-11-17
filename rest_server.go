@@ -16,8 +16,10 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -27,7 +29,6 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/valyala/tcplisten"
 	"go.aporeto.io/elemental"
-	"go.uber.org/zap"
 )
 
 var (
@@ -240,7 +241,8 @@ func (a *restServer) start(ctx context.Context, routesInfo map[int][]RouteInfo) 
 				FastOpen:    true,
 			}).NewListener("tcp4", a.server.Addr)
 			if err != nil {
-				zap.L().Fatal("Unable to dial", zap.Error(err))
+				slog.Error("Unable to dial", err)
+				os.Exit(1)
 			}
 		}
 
@@ -256,11 +258,12 @@ func (a *restServer) start(ctx context.Context, routesInfo map[int][]RouteInfo) 
 			if err == http.ErrServerClosed {
 				return
 			}
-			zap.L().Fatal("Unable to start api server", zap.Error(err))
+			slog.Error("Unable to start api server", err)
+			os.Exit(1)
 		}
 	}()
 
-	zap.L().Info("API server started", zap.String("address", a.cfg.restServer.listenAddress))
+	slog.Info("API server started", "address", a.cfg.restServer.listenAddress)
 
 	<-ctx.Done()
 }
@@ -272,9 +275,9 @@ func (a *restServer) stop() context.Context {
 	go func() {
 		defer cancel()
 		if err := a.server.Shutdown(ctx); err != nil {
-			zap.L().Error("Could not gracefully stop API server", zap.Error(err))
+			slog.Error("Could not gracefully stop API server", err)
 		} else {
-			zap.L().Debug("API server stopped")
+			slog.Debug("API server stopped")
 		}
 	}()
 

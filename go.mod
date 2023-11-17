@@ -1,9 +1,9 @@
 module go.aporeto.io/bahamut
 
-go 1.20
+go 1.21
 
 require (
-	go.aporeto.io/elemental v1.123.0
+	go.aporeto.io/elemental v1.123.1-0.20231116202419-3d09d6d39dcc
 	go.aporeto.io/tg v1.50.0
 	go.aporeto.io/wsc v1.51.0
 )
@@ -27,7 +27,6 @@ require (
 	github.com/valyala/tcplisten v1.0.0
 	github.com/vulcand/oxy v1.4.2
 	github.com/vulcand/oxy/v2 v2.0.0-20221121151423-d5cb734e4467
-	go.uber.org/zap v1.24.0
 	golang.org/x/time v0.3.0
 )
 
@@ -63,8 +62,6 @@ require (
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	github.com/vulcand/predicate v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.uber.org/atomic v1.10.0 // indirect
-	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect

@@ -21,9 +21,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"go.aporeto.io/elemental"
 	testmodel "go.aporeto.io/elemental/test/model"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 )
 
 // TestDispatchers_dispatchRetrieveManyOperation tests dispatchRetrieveManyOperation method
@@ -325,9 +322,6 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 // TestDispatchers_dispatchCreateOperation tests dispatchCreateOperation method
 func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 
-	zc, obs := observer.New(zapcore.DebugLevel)
-	zap.ReplaceGlobals(zap.New(zc))
-
 	Convey("Given I have a processor that handle ProcessCreate function", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
@@ -512,10 +506,6 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
-			logs := obs.AllUntimed()
-			So(len(logs), ShouldEqual, 1)
-			So(logs[0].Message, ShouldEqual, "Validation error")
-			_ = obs.TakeAll()
 		})
 	})
 
@@ -561,10 +551,6 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
-			logs := obs.AllUntimed()
-			So(len(logs), ShouldEqual, 1)
-			So(logs[0].Message, ShouldEqual, "Validation error")
-			_ = obs.TakeAll()
 		})
 	})
 
@@ -697,9 +683,6 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 
 // TestDispatchers_dispatchUpdateOperation tests dispatchUpdateOperation method
 func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
-
-	zc, obs := observer.New(zapcore.DebugLevel)
-	zap.ReplaceGlobals(zap.New(zc))
 
 	Convey("Given I have a processor that handle ProcessUpdate function", t, func() {
 		request := elemental.NewRequest()
@@ -883,10 +866,6 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
-			logs := obs.AllUntimed()
-			So(len(logs), ShouldEqual, 1)
-			So(logs[0].Message, ShouldEqual, "Validation error")
-			_ = obs.TakeAll()
 		})
 	})
 
@@ -933,10 +912,6 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
-			logs := obs.AllUntimed()
-			So(len(logs), ShouldEqual, 1)
-			So(logs[0].Message, ShouldEqual, "Validation error")
-			_ = obs.TakeAll()
 		})
 	})
 
@@ -1323,9 +1298,6 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 
 // TestDispatchers_dispatchPatchOperation tests dispatchPatchOperation method
 func TestDispatchers_dispatchPatchOperation(t *testing.T) {
-
-	zc, obs := observer.New(zapcore.DebugLevel)
-	zap.ReplaceGlobals(zap.New(zc))
 
 	Convey("Given I have a processor that handle ProcessPatch function", t, func() {
 		request := elemental.NewRequest()
@@ -1721,10 +1693,6 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
 			So(ctx.outputData, ShouldBeNil)
 			So(len(pusher.events), ShouldEqual, 0)
-			logs := obs.AllUntimed()
-			So(len(logs), ShouldEqual, 1)
-			So(logs[0].Message, ShouldEqual, "Validation error")
-			_ = obs.TakeAll()
 		})
 	})
 

@@ -15,6 +15,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"sync"
@@ -24,7 +25,6 @@ import (
 	"github.com/gorilla/websocket"
 	"go.aporeto.io/elemental"
 	"go.aporeto.io/wsc"
-	"go.uber.org/zap"
 )
 
 const (
@@ -36,22 +36,19 @@ const (
 type unregisterFunc func(*wsPushSession)
 
 type wsPushSession struct {
-	parametersLock        sync.RWMutex
 	startTime             time.Time
-	errorStateLock        sync.RWMutex
-	currentPushConfigLock sync.RWMutex
 	metadata              any
-	ctx                   context.Context
 	conn                  wsc.Websocket
+	ctx                   context.Context
+	parameters            url.Values
+	cancel                context.CancelFunc
+	tlsConnectionState    *tls.ConnectionState
 	dataCh                chan []byte
 	unregister            unregisterFunc
 	pushConfig            *elemental.PushConfig
 	closeCh               chan struct{}
 	claimsMap             map[string]string
-	parameters            url.Values
-	cancel                context.CancelFunc
 	headers               http.Header
-	tlsConnectionState    *tls.ConnectionState
 	encodingWrite         elemental.EncodingType
 	remoteAddr            string
 	id                    string
@@ -59,6 +56,9 @@ type wsPushSession struct {
 	claims                []string
 	cookies               []*http.Cookie
 	cfg                   config
+	currentPushConfigLock sync.RWMutex
+	parametersLock        sync.RWMutex
+	errorStateLock        sync.RWMutex
 	errorStateActive      bool
 }
 
@@ -109,18 +109,18 @@ func (s *wsPushSession) DirectPush(events ...*elemental.Event) {
 		// We convert the inner Entity to the requested encoding. We don't need additional
 		// check as elemental.Convert will do anything if the EncodingTypes are identical.
 		if err := event.Convert(s.encodingWrite); err != nil {
-			zap.L().Error("Unable to convert event",
-				zap.Stringer("event", event),
-				zap.Error(err),
+			slog.Error("Unable to convert event",
+				"event", event,
+				err,
 			)
 			continue
 		}
 
 		data, err := elemental.Encode(s.encodingWrite, event)
 		if err != nil {
-			zap.L().Error("Unable to encode event",
-				zap.Stringer("event", event),
-				zap.Error(err),
+			slog.Error("Unable to encode event",
+				"event", event,
+				err,
 			)
 			continue
 		}
@@ -196,9 +196,10 @@ func (s *wsPushSession) sendWSError(ee elemental.Error) {
 	s.setErrorState(true)
 	msgpack, json, err := prepareEventData(elemental.NewErrorEvent(ee, s.encodingWrite))
 	if err != nil {
-		zap.L().Error("elemental: unable to prepare error event - closing socket",
-			zap.String("sessionID", s.id),
-			zap.Error(err))
+		slog.Error("elemental: unable to prepare error event - closing socket",
+			"sessionID", s.id,
+			err,
+		)
 		s.close(websocket.CloseInternalServerErr)
 		return
 	}
@@ -255,9 +256,9 @@ func (s *wsPushSession) send(data []byte) {
 	select {
 	case s.dataCh <- data:
 	default:
-		zap.L().Warn("Slow consumer. event dropped",
-			zap.String("sessionID", s.id),
-			zap.Strings("claims", s.claims),
+		slog.Warn("Slow consumer. event dropped",
+			"sessionID", s.id,
+			"claims", s.claims,
 		)
 	}
 }
@@ -291,10 +292,10 @@ func (s *wsPushSession) listen() {
 			}
 
 			if err := pushConfig.ParseIdentityFilters(); err != nil {
-				zap.L().Debug("error parsing filter(s) in the received *elemental.PushConfig",
-					zap.Error(err),
-					zap.String("sessionID", s.id),
-					zap.String("pushConfig", pushConfig.String()),
+				slog.Debug("error parsing filter(s) in the received *elemental.PushConfig",
+					"sessionID", s.id,
+					"pushConfig", pushConfig.String(),
+					err,
 				)
 
 				if !s.handlesErrorEvents() {
@@ -318,7 +319,10 @@ func (s *wsPushSession) listen() {
 			s.setCurrentPushConfig(pushConfig)
 
 		case err := <-s.conn.Error():
-			zap.L().Error("Error received from websocket", zap.String("session", s.id), zap.Error(err))
+			slog.Error("Error received from websocket",
+				"session", s.id,
+				err,
+			)
 
 		case <-s.conn.Done():
 			return

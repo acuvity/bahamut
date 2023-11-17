@@ -3,6 +3,7 @@ package push
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/gofrs/uuid"
 	"go.aporeto.io/bahamut"
 	"go.aporeto.io/bahamut/gateway"
-	"go.uber.org/zap"
 	"golang.org/x/time/rate"
 )
 
@@ -372,10 +372,9 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 						},
 					)
 					c.latencies.Delete(ep)
-					zap.L().Info(
-						"Handled outdated service",
-						zap.String("name", srv.name),
-						zap.String("backend", ep),
+					slog.Info("Handled outdated service",
+						"name", srv.name,
+						"backend", ep,
 					)
 				}
 			}
@@ -391,7 +390,7 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 			var sp servicePing
 
 			if err = pub.Decode(&sp); err != nil {
-				zap.L().Error("Unable to decode service ping", zap.Error(err))
+				slog.Error("Unable to decode service ping", err)
 				break
 			}
 
@@ -409,10 +408,9 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 					c.lock.Lock()
 					c.apis = resyncRoutes(services, c.config.exposePrivateAPIs, c.config.eventsAPIs)
 					c.lock.Unlock()
-					zap.L().Debug(
-						"Handled service hello",
-						zap.String("key", sp.Key()),
-						zap.String("backend", sp.Endpoint),
+					slog.Debug("Handled service hello",
+						"key", sp.Key(),
+						"backend", sp.Endpoint,
 					)
 				}
 
@@ -436,16 +434,16 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 					c.apis = resyncRoutes(services, c.config.exposePrivateAPIs, c.config.eventsAPIs)
 					c.lock.Unlock()
 					c.latencies.Delete(sp.Endpoint)
-					zap.L().Debug(
+					slog.Debug(
 						"Handled service goodbye",
-						zap.String("key", sp.Key()),
-						zap.String("backend", sp.Endpoint),
+						"key", sp.Key(),
+						"backend", sp.Endpoint,
 					)
 				}
 			}
 
 		case err = <-errs:
-			zap.L().Error("Received error from pubsub services channel", zap.Error(err))
+			slog.Error("Received error from pubsub services channel", err)
 
 		case <-ctx.Done():
 			return
@@ -488,7 +486,7 @@ func (c *Upstreamer) listenPeers(ctx context.Context) {
 
 	// Send the first ping immediately
 	if err := c.pubsub.Publish(helloPub); err != nil {
-		zap.L().Error("Unable to send initial hello to pubsub peers channel", zap.Error(err))
+		slog.Error("Unable to send initial hello to pubsub peers channel", err)
 	}
 
 	for {
@@ -497,7 +495,7 @@ func (c *Upstreamer) listenPeers(ctx context.Context) {
 		case <-sendTicker.C:
 
 			if err := c.pubsub.Publish(helloPub); err != nil {
-				zap.L().Error("Unable to send hello to pubsub peers channel", zap.Error(err))
+				slog.Error("Unable to send hello to pubsub peers channel", err)
 			}
 
 		case <-cleanTicker.C:
@@ -523,7 +521,7 @@ func (c *Upstreamer) listenPeers(ctx context.Context) {
 			var ping peerPing
 
 			if err := pub.Decode(&ping); err != nil {
-				zap.L().Error("Unable to decode uostream ping", zap.Error(err))
+				slog.Error("Unable to decode uostream ping", err)
 				break
 			}
 
@@ -550,11 +548,11 @@ func (c *Upstreamer) listenPeers(ctx context.Context) {
 			}
 
 		case err := <-errs:
-			zap.L().Error("Received error from pubsub upstreams channel", zap.Error(err))
+			slog.Error("Received error from pubsub upstreams channel", err)
 
 		case <-ctx.Done():
 			if err := c.pubsub.Publish(goodbyePub); err != nil {
-				zap.L().Error("Unable to send hello to pubsub upstreams channel", zap.Error(err))
+				slog.Error("Unable to send hello to pubsub upstreams channel", err)
 			}
 
 			return

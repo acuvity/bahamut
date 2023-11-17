@@ -57,23 +57,23 @@ func (a *mockSessionAuthenticator) AuthenticateSession(Session) (AuthAction, err
 }
 
 type mockSessionHandler struct {
-	sync.Mutex
 	shouldPublishErr         error
 	onPushSessionInitErr     error
 	summarizeEventErr        error
 	summarizeEvent           any
 	shouldDispatchErr        error
 	relatedIdentities        []string
-	onPushSessionStopCalled  int
 	shouldDispatchCalled     int
+	onPushSessionStopCalled  int
 	relatedIdentitiesCalled  int
 	shouldPublishCalled      int
 	onPushSessionInitCalled  int
 	onPushSessionStartCalled int
 	summarizeEventCalled     int
-	shouldDispatchOK         bool
-	shouldPublishOK          bool
-	onPushSessionInitOK      bool
+	sync.Mutex
+	shouldDispatchOK    bool
+	shouldPublishOK     bool
+	onPushSessionInitOK bool
 }
 
 func (h *mockSessionHandler) OnPushSessionInit(PushSession) (bool, error) {

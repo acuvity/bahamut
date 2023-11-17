@@ -14,14 +14,20 @@ package bahamut
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"runtime/debug"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 	"go.aporeto.io/elemental"
-	"go.uber.org/zap"
 )
+
+type stackTaceLogger struct{}
+
+func (e stackTaceLogger) LogValue() slog.Value {
+	return slog.StringValue(string(debug.Stack()))
+}
 
 type handlerFunc func(*bcontext, config, processorFinderFunc, eventPusherFunc) *elemental.Response
 
@@ -126,9 +132,9 @@ func makeErrorResponse(ctx context.Context, response *elemental.Response, err er
 
 	if response.StatusCode == http.StatusInternalServerError {
 
-		zap.L().Error("Internal Server Error",
-			zap.Error(err),
-			zap.String("stack", string(debug.Stack())),
+		slog.Error("Internal Server Error",
+			slog.Any("error", err),
+			slog.Any("stacktrace", stackTaceLogger{}),
 		)
 	}
 

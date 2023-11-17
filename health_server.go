@@ -13,11 +13,11 @@ package bahamut
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 // an healthServer is the structure serving the health check endpoint.
@@ -89,18 +89,19 @@ func (s *healthServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *healthServer) start(ctx context.Context) {
 
-	zap.L().Debug("Health server enabled", zap.String("listen", s.cfg.healthServer.listenAddress))
+	slog.Debug("Health server enabled", "listen", s.cfg.healthServer.listenAddress)
 
 	go func() {
 		if err := s.server.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
 				return
 			}
-			zap.L().Fatal("Unable to start health server", zap.Error(err))
+			slog.Error("Unable to start health server", err)
+			os.Exit(1)
 		}
 	}()
 
-	zap.L().Info("Health server started", zap.String("address", s.cfg.healthServer.listenAddress))
+	slog.Info("Health server started", "address", s.cfg.healthServer.listenAddress)
 
 	<-ctx.Done()
 }
@@ -112,9 +113,9 @@ func (s *healthServer) stop() context.Context {
 	go func() {
 		defer cancel()
 		if err := s.server.Shutdown(ctx); err != nil {
-			zap.L().Error("Could not gracefully stop health server", zap.Error(err))
+			slog.Error("Could not gracefully stop health server", err)
 		} else {
-			zap.L().Debug("Health server stopped")
+			slog.Debug("Health server stopped")
 		}
 	}()
 

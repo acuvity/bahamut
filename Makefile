@@ -6,12 +6,12 @@ export GO111MODULE = on
 default: lint test
 
 lint:
-	# --enable=unparam
 	golangci-lint run \
 		--disable-all \
 		--exclude-use-default=false \
 		--exclude=package-comments \
 		--exclude=unused-parameter \
+		--exclude=dot-imports \
 		--enable=errcheck \
 		--enable=goimports \
 		--enable=ineffassign \

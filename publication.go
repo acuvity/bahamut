@@ -53,7 +53,6 @@ const (
 
 // Publication is a structure that can be published to a PublishServer.
 type Publication struct {
-	mux          sync.Mutex
 	span         opentracing.Span
 	TrackingData opentracing.TextMapCarrier `msgpack:"trackingData,omitempty" json:"trackingData,omitempty"`
 	replyCh      chan *Publication
@@ -62,7 +61,8 @@ type Publication struct {
 	Encoding     elemental.EncodingType `msgpack:"encoding,omitempty" json:"encoding,omitempty"`
 	Data         []byte                 `msgpack:"data,omitempty" json:"data,omitempty"`
 	ResponseMode ResponseMode           `msgpack:"responseMode,omitempty" json:"responseMode,omitempty"`
-	Partition    int32                  `msgpack:"partition,omitempty" json:"partition,omitempty"`
+	mux          sync.Mutex
+	Partition    int32 `msgpack:"partition,omitempty" json:"partition,omitempty"`
 	replied      bool
 	timedOut     bool
 }

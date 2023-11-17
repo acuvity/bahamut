@@ -165,8 +165,8 @@ func (p *mockProcessor) ProcessInfo(ctx Context) error {
 
 // A mockPusher is a mockable implementation of a Pusher.
 type mockPusher struct {
-	sync.Mutex
 	events []*elemental.Event
+	sync.Mutex
 }
 
 func (f *mockPusher) Push(evt ...*elemental.Event) {

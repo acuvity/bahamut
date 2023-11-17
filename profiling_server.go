@@ -13,11 +13,11 @@ package bahamut
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"net/http/pprof"
+	"os"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 // an profilingServer is the structure serving the profiling.
@@ -53,11 +53,12 @@ func (s *profilingServer) start(ctx context.Context) {
 			if err == http.ErrServerClosed {
 				return
 			}
-			zap.L().Fatal("Unable to start profiling server", zap.Error(err))
+			slog.Error("Unable to start profiling server", err)
+			os.Exit(1)
 		}
 	}()
 
-	zap.L().Info("Profiler server started", zap.String("address", s.cfg.profilingServer.listenAddress))
+	slog.Info("Profiler server started", "address", s.cfg.profilingServer.listenAddress)
 
 	<-ctx.Done()
 }
@@ -74,11 +75,11 @@ func (s *profilingServer) stop() {
 	go func() {
 		defer cancel()
 		if err := s.server.Shutdown(ctx); err != nil {
-			zap.L().Error("Could not gracefully stop profiling server", zap.Error(err))
+			slog.Error("Could not gracefully stop profiling server", err)
 		} else {
-			zap.L().Debug("Profiling server stopped")
+			slog.Debug("Profiling server stopped")
 		}
 	}()
 
-	zap.L().Debug("Profile server stopped")
+	slog.Debug("Profile server stopped")
 }

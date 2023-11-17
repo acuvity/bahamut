@@ -17,12 +17,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/gofrs/uuid"
 	nats "github.com/nats-io/nats.go"
 	"go.aporeto.io/elemental"
-	"go.uber.org/zap"
 )
 
 // natsClient is an interface for objects that can act as a NATS client
@@ -155,7 +155,7 @@ func (p *natsPubSub) Subscribe(pubs chan *Publication, errors chan error, topic 
 		publication := NewPublication(topic)
 
 		if e := elemental.Decode(elemental.EncodingTypeMSGPACK, m.Data, publication); e != nil {
-			zap.L().Error("Unable to decode publication envelope. Message dropped.", zap.Error(e))
+			slog.Error("Unable to decode publication envelope. Message dropped.", e)
 			return
 		}
 

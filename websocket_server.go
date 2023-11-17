@@ -14,6 +14,7 @@ package bahamut
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"sync"
@@ -23,17 +24,16 @@ import (
 	"github.com/gorilla/websocket"
 	"go.aporeto.io/elemental"
 	"go.aporeto.io/wsc"
-	"go.uber.org/zap"
 )
 
 type pushServer struct {
-	sessionsLock    sync.RWMutex
 	mainContext     context.Context
 	sessions        map[string]*wsPushSession
 	multiplexer     *bone.Mux
 	processorFinder processorFinderFunc
 	publications    chan *Publication
 	cfg             config
+	sessionsLock    sync.RWMutex
 }
 
 func newPushServer(cfg config, multiplexer *bone.Mux, processorFinder processorFinderFunc) *pushServer {
@@ -56,7 +56,7 @@ func newPushServer(cfg config, multiplexer *bone.Mux, processorFinder processorF
 	// the websocket routes.
 	if cfg.pushServer.enabled && cfg.pushServer.dispatchEnabled {
 		srv.multiplexer.Get(endpoint, http.HandlerFunc(srv.handleRequest))
-		zap.L().Debug("Websocket push handlers installed")
+		slog.Debug("Websocket push handlers installed")
 	}
 
 	return srv
@@ -163,7 +163,7 @@ func (n *pushServer) pushEvents(events ...*elemental.Event) {
 			var ok bool
 			ok, err = n.cfg.pushServer.publishHandler.ShouldPublish(event)
 			if err != nil {
-				zap.L().Error("Error while calling ShouldPublish", zap.Error(err))
+				slog.Error("Error while calling ShouldPublish", err)
 				continue
 			}
 
@@ -194,14 +194,18 @@ func (n *pushServer) pushEvents(events ...*elemental.Event) {
 
 		publication := NewPublication(topic)
 		if err = publication.Encode(event); err != nil {
-			zap.L().Error("Unable to encode event", zap.Error(err))
+			slog.Error("Unable to encode event", err)
 			break
 		}
 
 		for i := 0; i < 3; i++ {
 			err = n.cfg.pushServer.service.Publish(publication)
 			if err != nil {
-				zap.L().Warn("Unable to publish event", zap.String("topic", publication.Topic), zap.Stringer("event", event), zap.Error(err))
+				slog.Warn("Unable to publish event",
+					"topic", publication.Topic,
+					"event", event,
+					err,
+				)
 				continue
 			}
 			break
@@ -350,10 +354,10 @@ func (n *pushServer) start(ctx context.Context) {
 		defer n.cfg.pushServer.service.Subscribe(n.publications, errors, subTopic)()
 	}
 
-	zap.L().Debug("Websocket server started",
-		zap.Bool("push-enabled", n.cfg.pushServer.enabled),
-		zap.Bool("push-dispatching-enabled", n.cfg.pushServer.dispatchEnabled),
-		zap.Bool("push-publish-enabled", n.cfg.pushServer.publishEnabled),
+	slog.Debug("Websocket server started",
+		"push-enabled", n.cfg.pushServer.enabled,
+		"push-dispatching-enabled", n.cfg.pushServer.dispatchEnabled,
+		"push-publish-enabled", n.cfg.pushServer.publishEnabled,
 	)
 
 	for {
@@ -365,9 +369,9 @@ func (n *pushServer) start(ctx context.Context) {
 
 				event := &elemental.Event{}
 				if err := publication.Decode(event); err != nil {
-					zap.L().Error("Unable to decode event",
-						zap.Stringer("event", event),
-						zap.Error(err),
+					slog.Error("Unable to decode event",
+						"event", event,
+						err,
 					)
 					return
 				}
@@ -376,9 +380,9 @@ func (n *pushServer) start(ctx context.Context) {
 				// once for all.
 				dataMSGPACK, dataJSON, err := prepareEventData(event)
 				if err != nil {
-					zap.L().Error("Unable to prepare event encoding",
-						zap.Stringer("event", event),
-						zap.Error(err),
+					slog.Error("Unable to prepare event encoding",
+						"event", event,
+						err,
 					)
 					return
 				}
@@ -388,9 +392,9 @@ func (n *pushServer) start(ctx context.Context) {
 				if n.cfg.pushServer.dispatchHandler != nil {
 					eventSummary, err = n.cfg.pushServer.dispatchHandler.SummarizeEvent(event)
 					if err != nil {
-						zap.L().Error("Unable to summary event",
-							zap.Stringer("event", event),
-							zap.Error(err),
+						slog.Error("Unable to summary event",
+							"event", event,
+							err,
 						)
 						return
 					}
@@ -447,7 +451,7 @@ func (n *pushServer) start(ctx context.Context) {
 						if err != nil {
 							// temp before we move to error wrapping
 							if err != context.Canceled && !strings.Contains(err.Error(), "context canceled") {
-								zap.L().Error("Error while calling dispatchHandler.ShouldDispatch", zap.Error(err))
+								slog.Error("Error while calling dispatchHandler.ShouldDispatch", err)
 							}
 
 							continue
@@ -488,7 +492,7 @@ func (n *pushServer) stop() {
 		time.Sleep(10 * time.Millisecond)
 	}
 
-	zap.L().Info("Push server stopped")
+	slog.Info("Push server stopped")
 }
 
 func prepareEventData(event *elemental.Event) (msgpack []byte, json []byte, err error) {

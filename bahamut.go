@@ -14,6 +14,7 @@ package bahamut
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/go-zoo/bone"
 	"go.aporeto.io/elemental"
-	"go.uber.org/zap"
 )
 
 // CustomUmarshaller is the type of function use to create custom unmarshalling.
@@ -94,19 +94,19 @@ func New(options ...Option) Server {
 	}
 
 	if !c.restServer.enabled && !c.pushServer.enabled && !c.profilingServer.enabled && !c.healthServer.enabled {
-		zap.L().Warn("No server configured. Enable some servers through options")
+		slog.Warn("No server configured. Enable some servers through options")
 	}
 
 	if c.pushServer.enabled && (!c.pushServer.dispatchEnabled && !c.pushServer.publishEnabled) {
-		zap.L().Warn("Push server is enabled but neither dispatching or publishing is. Use bahamut.OptPushPublishHandler() and/or bahamut.OptPushDispatchHandler()")
+		slog.Warn("Push server is enabled but neither dispatching or publishing is. Use bahamut.OptPushPublishHandler() and/or bahamut.OptPushDispatchHandler()")
 	}
 
 	if !c.pushServer.enabled && c.pushServer.subjectHierarchiesEnabled {
-		zap.L().Warn("Push server subject hierarchies have been enabled, but no push server has been configured. Use bahamut.OptPushServer to configure a Push server.")
+		slog.Warn("Push server subject hierarchies have been enabled, but no push server has been configured. Use bahamut.OptPushServer to configure a Push server.")
 	}
 
 	if (c.restServer.enabled || c.pushServer.enabled) && len(c.model.modelManagers) == 0 {
-		zap.L().Warn("No elemental.ModelManager is defined. Use bahamut.OptModel()")
+		slog.Warn("No elemental.ModelManager is defined. Use bahamut.OptModel()")
 	}
 
 	return NewServer(c)
@@ -261,7 +261,7 @@ func (b *server) Run(ctx context.Context) {
 
 	if hook := b.cfg.hooks.postStart; hook != nil {
 		if err := hook(b); err != nil {
-			zap.L().Fatal("Unable to execute bahamut postStart hook", zap.Error(err))
+			slog.Error("Unable to execute bahamut postStart hook", err)
 		}
 	}
 
@@ -269,7 +269,7 @@ func (b *server) Run(ctx context.Context) {
 
 	if hook := b.cfg.hooks.preStop; hook != nil {
 		if err := hook(b); err != nil {
-			zap.L().Error("Unable to execute bahamut preStop hook", zap.Error(err))
+			slog.Error("Unable to execute bahamut preStop hook", err)
 		}
 	}
 

@@ -2,13 +2,13 @@ package push
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"runtime"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/process"
 	"go.aporeto.io/bahamut"
-	"go.uber.org/zap"
 )
 
 // A Notifier sends ServicePing to the Wutai gateways.
@@ -106,19 +106,19 @@ func (w *Notifier) MakeStartHook(ctx context.Context) func(server bahamut.Server
 				case <-time.After(w.frequency):
 
 					if pct, err = p.Percent(0); err != nil {
-						zap.L().Error("Unable to retrieve cpu usage", zap.Error(err))
+						slog.Error("Unable to retrieve cpu usage", err)
 						continue
 					}
 
 					sp.Load = pct / cores
 
 					if err := pub.Encode(sp); err != nil {
-						zap.L().Error("Unable to encode service ping", zap.Error(err))
+						slog.Error("Unable to encode service ping", err)
 						continue
 					}
 
 					if err := w.pubsub.Publish(pub); err != nil {
-						zap.L().Error("Unable to send wutai up ping", zap.Error(err))
+						slog.Error("Unable to send wutai up ping", err)
 					}
 				case <-ctx.Done():
 					return
