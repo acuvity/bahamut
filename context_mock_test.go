@@ -78,6 +78,7 @@ func TestMockContext_Duplicate(t *testing.T) {
 
 		cookies := []*http.Cookie{{}, {}}
 		rwriter := func(http.ResponseWriter) int { return 0 }
+		od := testmodel.NewList()
 
 		ctx := NewMockContext(context.Background())
 		ctx.MockRequest = req
@@ -94,6 +95,7 @@ func TestMockContext_Duplicate(t *testing.T) {
 		ctx.AddOutputCookies(cookies[0], cookies[1])
 		ctx.SetResponseWriter(rwriter)
 		ctx.SetDisableOutputDataPush(true)
+		ctx.MockOriginalData = od
 
 		Convey("When I call the Duplicate method", func() {
 
@@ -117,6 +119,7 @@ func TestMockContext_Duplicate(t *testing.T) {
 				So(ctx.MockOutputCookies, ShouldResemble, cookies)
 				So(ctx.MockResponseWriter, ShouldEqual, rwriter)
 				So(ctx.MockDisableOutputDataPush, ShouldEqual, ctx.MockDisableOutputDataPush)
+				So(ctx.OriginalData(), ShouldEqual, ctx.OriginalData())
 			})
 		})
 	})

@@ -404,6 +404,8 @@ func dispatchPatchOperation(
 			return err
 		}
 
+		ctx.originalData = identifiable
+
 		patchable, ok := identifiable.(elemental.Patchable)
 		if !ok {
 			err := elemental.NewError("Bad Request", "Identifiable is not patchable", "bahamut", http.StatusBadRequest)

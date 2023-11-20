@@ -24,6 +24,7 @@ type bcontext struct {
 	outputData            any
 	ctx                   context.Context
 	inputData             any
+	originalData          elemental.Identifiable
 	claimsMap             map[string]string
 	responseWriter        ResponseWriter
 	request               *elemental.Request
@@ -90,6 +91,10 @@ func (c *bcontext) InputData() any {
 
 func (c *bcontext) SetInputData(data any) {
 	c.inputData = data
+}
+
+func (c *bcontext) OriginalData() any {
+	return c.originalData
 }
 
 func (c *bcontext) OutputData() any {
@@ -215,6 +220,7 @@ func (c *bcontext) Duplicate() Context {
 	c2.outputCookies = append(c2.outputCookies, c.outputCookies...)
 	c2.responseWriter = c.responseWriter
 	c2.disableOutputDataPush = c.disableOutputDataPush
+	c2.originalData = c.originalData
 
 	for k, v := range c.claimsMap {
 		c2.claimsMap[k] = v

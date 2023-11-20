@@ -1632,9 +1632,10 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		}
 
 		var retrieverCalled int
+		original := &testmodel.List{ID: expectedID, Name: "will be patched"}
 		retriever := func(req *elemental.Request) (elemental.Identifiable, error) {
 			retrieverCalled++
-			return &testmodel.List{ID: expectedID, Name: "will be patched"}, nil
+			return original, nil
 		}
 
 		auditer := &mockAuditer{}
@@ -1650,6 +1651,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 			So(retrieverCalled, ShouldEqual, 1)
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
 			So(ctx.outputData, ShouldResemble, &testmodel.SparseList{ID: &expectedID, Name: &expectedName})
+			So(ctx.originalData, ShouldEqual, original)
 			So(len(pusher.events), ShouldEqual, 2)
 			So(pusher.events[0].Type, ShouldEqual, elemental.EventDelete)
 			So(pusher.events[1].Type, ShouldEqual, elemental.EventUpdate)

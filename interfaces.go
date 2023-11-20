@@ -116,6 +116,10 @@ type Context interface {
 	// SetInputData replaces the current input data.
 	SetInputData(any)
 
+	// OriginalData returns the data that may have been retrieved using
+	// the configured IdentifiableRetriever during the Update process.
+	OriginalData() any
+
 	// OutputData returns the current output data.
 	OutputData() any
 

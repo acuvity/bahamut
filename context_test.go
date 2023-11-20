@@ -127,6 +127,7 @@ func TestContext_Duplicate(t *testing.T) {
 
 		cookies := []*http.Cookie{{}, {}}
 		rwriter := func(http.ResponseWriter) int { return 0 }
+		od := testmodel.NewList()
 
 		ctx := newContext(context.Background(), req)
 		ctx.SetCount(10)
@@ -142,6 +143,7 @@ func TestContext_Duplicate(t *testing.T) {
 		ctx.AddOutputCookies(cookies[0], cookies[1])
 		ctx.SetResponseWriter(rwriter)
 		ctx.SetDisableOutputDataPush(true)
+		ctx.originalData = od
 
 		Convey("When I call the Duplicate method", func() {
 
@@ -163,7 +165,9 @@ func TestContext_Duplicate(t *testing.T) {
 				So(ctx.outputCookies, ShouldResemble, ctx2.(*bcontext).outputCookies)
 				So(ctx.outputCookies, ShouldResemble, cookies)
 				So(ctx.responseWriter, ShouldEqual, rwriter)
-				So(ctx.disableOutputDataPush, ShouldEqual, ctx.disableOutputDataPush)
+				So(ctx.disableOutputDataPush, ShouldEqual, ctx2.(*bcontext).disableOutputDataPush)
+				So(ctx.OriginalData(), ShouldEqual, ctx2.OriginalData())
+
 			})
 		})
 	})

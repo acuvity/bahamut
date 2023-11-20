@@ -25,6 +25,7 @@ type MockContext struct {
 	MockCtx                   context.Context
 	MockOutputData            any
 	MockInputData             any
+	MockOriginalData          any
 	MockMetadata              map[any]any
 	MockClaimsMap             map[string]string
 	MockResponseWriter        ResponseWriter
@@ -83,6 +84,11 @@ func (c *MockContext) InputData() any {
 // SetInputData sets the context's input data.
 func (c *MockContext) SetInputData(data any) {
 	c.MockInputData = data
+}
+
+// OriginalData returns the context's original data.
+func (c *MockContext) OriginalData() any {
+	return c.MockOriginalData
 }
 
 // OutputData returns the context's output data.
@@ -215,6 +221,7 @@ func (c *MockContext) Duplicate() Context {
 	c2.MockOutputCookies = append(c2.MockOutputCookies, c.MockOutputCookies...)
 	c2.MockResponseWriter = c.MockResponseWriter
 	c2.MockDisableOutputDataPush = c.MockDisableOutputDataPush
+	c2.MockOriginalData = c.MockOriginalData
 
 	for k, v := range c.MockClaimsMap {
 		c2.MockClaimsMap[k] = v
