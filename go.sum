@@ -825,6 +825,8 @@ github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPR
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
 go.acuvity.ai/elemental v0.0.0-20231121185734-b906b9db4bde h1:GEFglx9d0INlbKUC1TiH0pEMChrhdFQ65UpQ83b08TM=
 go.acuvity.ai/elemental v0.0.0-20231121185734-b906b9db4bde/go.mod h1:A8g4Rscsjyt8t2BCfsecAIDsnJn8c3GiLk88za4LzT8=
+go.acuvity.ai/elemental v0.0.0-20231121190100-e6529b0175e9 h1:Sknr46tM0QkxWWw+cLu0FEoxy2y7854l7/CDFKuXh1w=
+go.acuvity.ai/elemental v0.0.0-20231121190100-e6529b0175e9/go.mod h1:JLhOQtk/N+FsCnC5a+JkoavX9cRTvuvjTd0iSOwRXSE=
 go.acuvity.ai/tg v0.0.0-20231121173706-ce2d43efa4e1 h1:qnzBl/JvS33luGhVKkTbI1HoPQXjpyf1v6sJp0HPP9g=
 go.acuvity.ai/tg v0.0.0-20231121173706-ce2d43efa4e1/go.mod h1:MFtXdqQHQwSqTFWE4XmBJk/cGHZuhPDh+o+qGynv8gI=
 go.acuvity.ai/wsc v0.0.0-20231121173228-eedea208383e h1:LGkFIOPRhKTwB5hAMjKTsc7DU0PFpv6ueRE5hf5MElc=
