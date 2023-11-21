@@ -3,9 +3,9 @@ module go.acuvity.ai/bahamut
 go 1.21
 
 require (
-	go.acuvity.ai/elemental v1.123.1-0.20231116202419-3d09d6d39dcc
-	go.acuvity.ai/tg v1.50.0
-	go.acuvity.ai/wsc v1.51.0
+	go.acuvity.ai/elemental v0.0.0-20231121185734-b906b9db4bde
+	go.acuvity.ai/tg v0.0.0-20231121173706-ce2d43efa4e1
+	go.acuvity.ai/wsc v0.0.0-20231121173228-eedea208383e
 )
 
 require (
