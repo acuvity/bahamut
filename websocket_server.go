@@ -22,8 +22,8 @@ import (
 
 	"github.com/go-zoo/bone"
 	"github.com/gorilla/websocket"
-	"go.aporeto.io/elemental"
-	"go.aporeto.io/wsc"
+	"go.acuvity.ai/elemental"
+	"go.acuvity.ai/wsc"
 )
 
 type pushServer struct {

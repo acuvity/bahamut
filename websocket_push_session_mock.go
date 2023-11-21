@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 var _ PushSession = &MockSession{}

@@ -12,7 +12,7 @@
 package simple
 
 import (
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // CustomShouldPublishFunc is the type of function that can be used

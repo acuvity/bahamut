@@ -1,11 +1,11 @@
-module go.aporeto.io/bahamut
+module go.acuvity.ai/bahamut
 
 go 1.21
 
 require (
-	go.aporeto.io/elemental v1.123.1-0.20231116202419-3d09d6d39dcc
-	go.aporeto.io/tg v1.50.0
-	go.aporeto.io/wsc v1.51.0
+	go.acuvity.ai/elemental v1.123.1-0.20231116202419-3d09d6d39dcc
+	go.acuvity.ai/tg v1.50.0
+	go.acuvity.ai/wsc v1.51.0
 )
 
 require (

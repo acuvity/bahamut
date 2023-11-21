@@ -11,7 +11,7 @@ import (
 
 	"github.com/mailgun/multibuf"
 	"github.com/vulcand/oxy/v2/connlimit"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 var (

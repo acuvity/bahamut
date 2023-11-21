@@ -20,7 +20,7 @@ import (
 
 	opentracing "github.com/opentracing/opentracing-go"
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 func TestUtils_RecoverFromPanic(t *testing.T) {

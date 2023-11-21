@@ -22,8 +22,8 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/elemental"
 )
 
 func TestBahamut_MTLSAuthorizer(t *testing.T) {

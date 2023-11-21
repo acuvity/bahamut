@@ -28,7 +28,7 @@ import (
 	"github.com/go-zoo/bone"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/valyala/tcplisten"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 var (

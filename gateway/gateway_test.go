@@ -15,8 +15,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/tg/tglib"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/tg/tglib"
 	"golang.org/x/time/rate"
 )
 

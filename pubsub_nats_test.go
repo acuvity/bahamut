@@ -27,7 +27,7 @@ import (
 	natsserver "github.com/nats-io/nats-server/v2/test"
 	nats "github.com/nats-io/nats.go"
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 func TestNats_NewNATSPubSubClient(t *testing.T) {

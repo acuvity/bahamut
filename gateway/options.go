@@ -6,8 +6,8 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/elemental"
 	"golang.org/x/time/rate"
 )
 

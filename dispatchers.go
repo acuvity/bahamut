@@ -16,7 +16,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 func audit(auditer Auditer, ctx *bcontext, err error) {

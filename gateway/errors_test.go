@@ -15,7 +15,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/vulcand/oxy/ratelimit"
 	"github.com/vulcand/oxy/v2/connlimit"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 type fakeNetErr struct {

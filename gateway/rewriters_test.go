@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/tg/tglib"
+	"go.acuvity.ai/tg/tglib"
 )
 
 func Test_requestRewriter(t *testing.T) {

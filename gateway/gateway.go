@@ -21,7 +21,7 @@ import (
 	"github.com/vulcand/oxy/v2/connlimit"
 	"github.com/vulcand/oxy/v2/forward"
 	"github.com/vulcand/oxy/v2/utils"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 // An gateway is cool

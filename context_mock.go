@@ -16,7 +16,7 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // A MockContext can be used to mock a bahamut.Context

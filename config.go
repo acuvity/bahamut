@@ -20,7 +20,7 @@ import (
 	"time"
 
 	opentracing "github.com/opentracing/opentracing-go"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 	"golang.org/x/time/rate"
 )
 

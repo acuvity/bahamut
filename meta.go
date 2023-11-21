@@ -16,7 +16,7 @@ import (
 	"sort"
 	"strings"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // A RouteInfo contains basic information about an api route.

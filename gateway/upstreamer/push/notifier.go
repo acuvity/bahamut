@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/process"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 // A Notifier sends ServicePing to the Wutai gateways.

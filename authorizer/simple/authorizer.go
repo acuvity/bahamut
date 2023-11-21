@@ -11,7 +11,7 @@
 
 package simple
 
-import "go.aporeto.io/bahamut"
+import "go.acuvity.ai/bahamut"
 
 // A Authorizer is a bahamut.Authorizer compliant structure to authorize
 // requests using a given functions.

@@ -16,8 +16,8 @@ import (
 	"reflect"
 	"testing"
 
-	"go.aporeto.io/elemental"
-	testmodel "go.aporeto.io/elemental/test/model"
+	"go.acuvity.ai/elemental"
+	testmodel "go.acuvity.ai/elemental/test/model"
 )
 
 func Test_buildVersionedRoutes(t *testing.T) {

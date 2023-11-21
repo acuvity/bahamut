@@ -14,7 +14,7 @@ package bahamut
 import (
 	"net/http"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // CheckAuthentication checks if the current context has been authenticated if there is any authenticator registered.

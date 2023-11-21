@@ -22,7 +22,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	nats "github.com/nats-io/nats.go"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // natsClient is an interface for objects that can act as a NATS client

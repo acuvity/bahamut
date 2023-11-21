@@ -12,4 +12,4 @@
 // Package simple provides implementations of bahamut.SessionAuthenticator
 // bahamut.RequestAuthenticator and a bahamut.Authorizer using
 // a given function to decide if a request should be authenticated/authorized.
-package simple // import "go.aporeto.io/bahamut/authorizer/simple"
+package simple // import "go.acuvity.ai/bahamut/authorizer/simple"

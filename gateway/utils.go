@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/go-zoo/bone"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 func injectGeneralHeader(h http.Header) http.Header {

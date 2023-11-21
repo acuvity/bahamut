@@ -5,7 +5,7 @@ import (
 	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 	"golang.org/x/time/rate"
 )
 

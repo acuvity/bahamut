@@ -21,7 +21,7 @@ import (
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 func handleRecoveredPanic(ctx context.Context, r any, disablePanicRecovery bool) error {

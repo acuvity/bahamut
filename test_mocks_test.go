@@ -18,7 +18,7 @@ import (
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // A counter is a concurency safe count holder.

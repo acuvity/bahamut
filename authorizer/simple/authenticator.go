@@ -12,7 +12,7 @@
 package simple
 
 import (
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 // CustomAuthRequestFunc is the type of functions that can be used to

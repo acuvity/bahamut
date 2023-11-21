@@ -16,7 +16,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 func TestAuthorizer_NewAuthorizer(t *testing.T) {

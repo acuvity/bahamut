@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/bahamut/gateway"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/bahamut/gateway"
 	"golang.org/x/time/rate"
 )
 

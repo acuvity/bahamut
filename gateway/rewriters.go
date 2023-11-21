@@ -9,7 +9,7 @@ import (
 	"net/http/httputil"
 	"strings"
 
-	"go.aporeto.io/tg/tglib"
+	"go.acuvity.ai/tg/tglib"
 )
 
 const internalWSMarkingHeader = "__internal_ws__"

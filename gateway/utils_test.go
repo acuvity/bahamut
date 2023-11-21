@@ -8,8 +8,8 @@ import (
 	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/tg/tglib"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/tg/tglib"
 )
 
 func Test_injectGeneralHeader(t *testing.T) {

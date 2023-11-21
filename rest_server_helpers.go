@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 // Various common errors

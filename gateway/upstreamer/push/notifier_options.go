@@ -3,7 +3,7 @@ package push
 import (
 	"time"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 type notifierConfig struct {

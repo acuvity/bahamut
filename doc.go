@@ -14,4 +14,4 @@
 //
 // Bahamut uses an Elemental model generated from a set of Regolithe Specifications
 // You will just need to write various processors to handle the business logic and storage.
-package bahamut // import "go.aporeto.io/bahamut"
+package bahamut // import "go.acuvity.ai/bahamut"

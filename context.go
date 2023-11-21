@@ -17,7 +17,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 type bcontext struct {

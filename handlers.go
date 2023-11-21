@@ -20,7 +20,7 @@ import (
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 type stackTaceLogger struct{}

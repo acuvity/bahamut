@@ -8,7 +8,7 @@ import (
 	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 	"golang.org/x/time/rate"
 )
 

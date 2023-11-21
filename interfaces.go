@@ -16,7 +16,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/elemental"
 )
 
 type processorFinderFunc func(identity elemental.Identity) (Processor, error)

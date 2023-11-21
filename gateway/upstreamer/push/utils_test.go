@@ -9,7 +9,7 @@ import (
 	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 )
 
 func Test_getTargetIdentity(t *testing.T) {

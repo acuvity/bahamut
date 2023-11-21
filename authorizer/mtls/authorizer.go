@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"strings"
 
-	"go.aporeto.io/bahamut"
-	"go.aporeto.io/elemental"
+	"go.acuvity.ai/bahamut"
+	"go.acuvity.ai/elemental"
 )
 
 const tlsHeaderKey = "X-TLS-Client-Certificate"

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"go.aporeto.io/bahamut"
+	"go.acuvity.ai/bahamut"
 	"golang.org/x/time/rate"
 )
 

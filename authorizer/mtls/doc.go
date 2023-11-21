@@ -9,4 +9,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mtls // import "go.aporeto.io/bahamut/authorizer/mtls"
+package mtls // import "go.acuvity.ai/bahamut/authorizer/mtls"
