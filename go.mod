@@ -3,9 +3,9 @@ module go.acuvity.ai/bahamut
 go 1.21
 
 require (
-	go.acuvity.ai/elemental v0.0.0-20231121190100-e6529b0175e9
-	go.acuvity.ai/tg v0.0.0-20231121173706-ce2d43efa4e1
-	go.acuvity.ai/wsc v0.0.0-20231121173228-eedea208383e
+	go.acuvity.ai/elemental v0.0.0-20231122005432-a4b35bbdaca3
+	go.acuvity.ai/tg v0.0.0-20231122004536-47ae4ba0efc0
+	go.acuvity.ai/wsc v0.0.0-20231122003955-dc50470c8ac6
 )
 
 require (
@@ -43,6 +43,7 @@ require (
 	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20230110061619-bbe2e5e100de // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
@@ -63,6 +64,7 @@ require (
 	github.com/vulcand/predicate v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/term v0.6.0 // indirect
