@@ -12,6 +12,7 @@
 package bahamut
 
 import (
+	"fmt"
 	"net/http"
 
 	"go.acuvity.ai/elemental"
@@ -74,7 +75,16 @@ func CheckAuthorization(authorizers []Authorizer, ctx Context) (err error) {
 		case AuthActionOK:
 			return nil
 		case AuthActionKO:
-			return elemental.NewError("Forbidden", "You are not allowed to access this resource.", "bahamut", http.StatusForbidden)
+			return elemental.NewError(
+				"Forbidden",
+				fmt.Sprintf(
+					"You are not allowed to perform '%s' on '%s'",
+					ctx.Request().Operation,
+					ctx.Request().Identity.Category,
+				),
+				"bahamut",
+				http.StatusForbidden,
+			)
 		case AuthActionContinue:
 			continue
 		}
