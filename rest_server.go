@@ -71,7 +71,7 @@ func (a *restServer) createSecureHTTPServer(address string) *http.Server {
 	tlsConfig := &tls.Config{
 		ClientAuth:             a.cfg.tls.authType,
 		ClientCAs:              a.cfg.tls.clientCAPool,
-		MinVersion:             tls.VersionTLS12,
+		MinVersion:             tls.VersionTLS13,
 		SessionTicketsDisabled: a.cfg.tls.disableSessionTicket,
 		NextProtos:             a.cfg.tls.nextProtos,
 		VerifyPeerCertificate:  a.cfg.tls.peerCertificateVerifyFunc,
