@@ -78,9 +78,10 @@ func CheckAuthorization(authorizers []Authorizer, ctx Context) (err error) {
 			return elemental.NewError(
 				"Forbidden",
 				fmt.Sprintf(
-					"You are not allowed to perform '%s' on '%s'",
+					"You are not allowed to perform '%s' on '%s' in namespace '%s'",
 					ctx.Request().Operation,
 					ctx.Request().Identity.Category,
+					ctx.Request().Namespace,
 				),
 				"bahamut",
 				http.StatusForbidden,
