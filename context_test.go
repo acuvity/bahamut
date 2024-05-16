@@ -132,7 +132,8 @@ func TestContext_Duplicate(t *testing.T) {
 		ctx := newContext(context.Background(), req)
 		ctx.SetCount(10)
 		ctx.SetInputData("input")
-		ctx.SetInputData("output")
+		ctx.SetOutputData("output")
+		ctx.SetOriginalData(od)
 		ctx.SetStatusCode(42)
 		ctx.AddMessage("a")
 		ctx.SetRedirect("laba")
@@ -143,7 +144,6 @@ func TestContext_Duplicate(t *testing.T) {
 		ctx.AddOutputCookies(cookies[0], cookies[1])
 		ctx.SetResponseWriter(rwriter)
 		ctx.SetDisableOutputDataPush(true)
-		ctx.originalData = od
 
 		Convey("When I call the Duplicate method", func() {
 

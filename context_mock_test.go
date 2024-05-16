@@ -85,6 +85,7 @@ func TestMockContext_Duplicate(t *testing.T) {
 		ctx.SetCount(10)
 		ctx.SetInputData("input")
 		ctx.SetOutputData("output")
+		ctx.SetOriginalData(od)
 		ctx.SetStatusCode(42)
 		ctx.AddMessage("a")
 		ctx.SetRedirect("laba")
@@ -95,7 +96,6 @@ func TestMockContext_Duplicate(t *testing.T) {
 		ctx.AddOutputCookies(cookies[0], cookies[1])
 		ctx.SetResponseWriter(rwriter)
 		ctx.SetDisableOutputDataPush(true)
-		ctx.MockOriginalData = od
 
 		Convey("When I call the Duplicate method", func() {
 

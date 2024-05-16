@@ -24,7 +24,7 @@ type bcontext struct {
 	outputData            any
 	ctx                   context.Context
 	inputData             any
-	originalData          elemental.Identifiable
+	originalData          any
 	claimsMap             map[string]string
 	responseWriter        ResponseWriter
 	request               *elemental.Request
@@ -95,6 +95,10 @@ func (c *bcontext) SetInputData(data any) {
 
 func (c *bcontext) OriginalData() any {
 	return c.originalData
+}
+
+func (c *bcontext) SetOriginalData(data any) {
+	c.originalData = data
 }
 
 func (c *bcontext) OutputData() any {

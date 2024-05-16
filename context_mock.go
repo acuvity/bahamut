@@ -91,6 +91,11 @@ func (c *MockContext) OriginalData() any {
 	return c.MockOriginalData
 }
 
+// SetOriginalData sets the context's original data.
+func (c *MockContext) SetOriginalData(data any) {
+	c.MockOriginalData = data
+}
+
 // OutputData returns the context's output data.
 func (c *MockContext) OutputData() any {
 	return c.MockOutputData

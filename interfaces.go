@@ -120,6 +120,9 @@ type Context interface {
 	// the configured IdentifiableRetriever during the Update process.
 	OriginalData() any
 
+	// SetOriginalData replaces the current original data.
+	SetOriginalData(any)
+
 	// OutputData returns the current output data.
 	OutputData() any
 
