@@ -700,7 +700,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		pusher := &mockPusher{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, nil)
 
 		expectedNbCalls := 1
 
@@ -742,7 +742,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			Convey("Then I should not panic no events should be pushed", func() {
 				var err error
 				So(func() {
-					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil)
+					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, nil)
 				}, ShouldNotPanic)
 				So(err, ShouldBeNil)
 				So(ctx.InputData, ShouldNotBeNil)
@@ -765,7 +765,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			Convey("Then I should not panic no events should be pushed", func() {
 				var err error
 				So(func() {
-					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil)
+					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, nil)
 				}, ShouldNotPanic)
 				So(err, ShouldBeNil)
 				So(ctx.InputData, ShouldNotBeNil)
@@ -791,7 +791,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			Convey("Then I should not panic and an event should be pushed", func() {
 				var err error
 				So(func() {
-					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil)
+					err = dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, nil)
 				}, ShouldNotPanic)
 				So(err, ShouldBeNil)
 				So(ctx.InputData, ShouldNotBeNil)
@@ -814,7 +814,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		auditer := &mockAuditer{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, true, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, true, nil, nil)
 
 		Convey("Then I should have a 423 error and context should be nil", func() {
 			So(err, ShouldNotBeNil)
@@ -836,7 +836,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		auditer := &mockAuditer{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil, nil)
 
 		expectedError := "error 400 (bahamut-test): Error: Bad request."
 		expectedNbCalls := 1
@@ -858,7 +858,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		auditer := &mockAuditer{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil, nil)
 
 		expectedError := "error 422 (elemental): Validation Error: Attribute 'name' is required"
 		expectedNbCalls := 1
@@ -881,7 +881,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		auditer := &mockAuditer{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil, nil)
 
 		expectedError := "error 400 (bahamut): Bad Request: unable to decode application/json: json decode error [pos 1]: only encoded map or array can decode into struct"
 		expectedNbCalls := 1
@@ -904,7 +904,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		auditer := &mockAuditer{}
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil, nil)
 
 		expectedError := "error 422 (elemental): Validation Error: Data 'not-good' of attribute 'status' is not in list '[DONE PROGRESS TODO]'"
 		expectedNbCalls := 1
@@ -930,7 +930,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		expectedNbCalls := 1
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, nil, auditer, false, nil, nil)
 
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
@@ -961,7 +961,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		expectedNbCalls := 1
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, authenticators, nil, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, authenticators, nil, nil, auditer, false, nil, nil)
 
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
@@ -1001,7 +1001,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		expectedNbCalls := 1
 
 		ctx := newContext(context.Background(), request)
-		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, authenticators, authorizers, nil, auditer, false, nil)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, authenticators, authorizers, nil, auditer, false, nil, nil)
 
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, expectedError)
@@ -1034,10 +1034,130 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			nil,
 			false,
 			nil,
+			nil,
 		)
 
 		Convey("Then I should get a bahamut error and no context", func() {
 			So(err.Error(), ShouldEqual, fmt.Sprintf("error 400 (bahamut): Bad Request: %s", expectedError))
+		})
+	})
+
+	Convey("Given I have a processor that handle ProcessUpdate function and uses an elementalRetriever that works", t, func() {
+		request := elemental.NewRequest()
+		request.Identity = testmodel.ListIdentity
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+
+		expectedID := "a"
+
+		processorFinder := func(identity elemental.Identity) (Processor, error) {
+			return &mockProcessor{
+				output: &testmodel.List{ID: "a", Secret: "can't see me"},
+				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
+			}, nil
+		}
+
+		auditer := &mockAuditer{}
+		pusher := &mockPusher{}
+
+		var retrieverCalled int
+		original := &testmodel.List{ID: expectedID, Name: "will be patched"}
+		retriever := func(req *elemental.Request) (elemental.Identifiable, error) {
+			retrieverCalled++
+			return original, nil
+		}
+
+		ctx := newContext(context.Background(), request)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, retriever)
+
+		expectedNbCalls := 1
+
+		Convey("Then I should have no error and context should be initiated", func() {
+			So(err, ShouldBeNil)
+			So(retrieverCalled, ShouldEqual, 1)
+			So(ctx.InputData, ShouldNotBeNil)
+			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
+			So(ctx.outputData, ShouldResemble, &testmodel.List{ID: "a"})
+			So(ctx.originalData, ShouldEqual, original)
+			So(len(pusher.events), ShouldEqual, 2)
+			So(pusher.events[0].Type, ShouldEqual, elemental.EventDelete)
+			So(pusher.events[0].RawData, ShouldNotContain, []byte("can't see me"))
+			So(pusher.events[0].JSONData, ShouldNotContain, []byte("can't see me"))
+			So(pusher.events[1].Type, ShouldEqual, elemental.EventUpdate)
+			So(pusher.events[1].RawData, ShouldNotContain, []byte("can't see me"))
+			So(pusher.events[1].JSONData, ShouldNotContain, []byte("can't see me"))
+		})
+	})
+
+	Convey("Given I have a processor that handle ProcessUpdate function and uses a working elementalRetriever with an invalid object", t, func() {
+		request := elemental.NewRequest()
+		request.Identity = testmodel.ListIdentity
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+
+		expectedID := "a"
+
+		processorFinder := func(identity elemental.Identity) (Processor, error) {
+			return &mockProcessor{
+				output: &testmodel.List{ID: "a", Secret: "can't see me"},
+				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
+			}, nil
+		}
+
+		auditer := &mockAuditer{}
+		pusher := &mockPusher{}
+
+		var retrieverCalled int
+		retriever := func(req *elemental.Request) (elemental.Identifiable, error) {
+			retrieverCalled++
+			return &testmodel.Task{ID: expectedID, Name: "will be patched"}, nil
+		}
+
+		ctx := newContext(context.Background(), request)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, retriever)
+
+		expectedError := `error 400 (bahamut): Bad Request: Update and target do not have the same identity`
+		expectedNbCalls := 1
+
+		Convey("Then I should get a bahamut error and no context", func() {
+			So(err, ShouldNotEqual, nil)
+			So(err.Error(), ShouldEqual, expectedError)
+			So(retrieverCalled, ShouldEqual, 1)
+			So(ctx.InputData, ShouldNotBeNil)
+			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
+		})
+	})
+
+	Convey("Given I have a processor that handle ProcessUpdate function and uses an elementalRetriever that fails", t, func() {
+		request := elemental.NewRequest()
+		request.Identity = testmodel.ListIdentity
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+
+		processorFinder := func(identity elemental.Identity) (Processor, error) {
+			return &mockProcessor{
+				output: &testmodel.List{ID: "a", Secret: "can't see me"},
+				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
+			}, nil
+		}
+
+		auditer := &mockAuditer{}
+		pusher := &mockPusher{}
+
+		var retrieverCalled int
+		retriever := func(req *elemental.Request) (elemental.Identifiable, error) {
+			retrieverCalled++
+			return nil, fmt.Errorf("oh noes")
+		}
+
+		ctx := newContext(context.Background(), request)
+		err := dispatchUpdateOperation(ctx, processorFinder, testmodel.Manager(), nil, nil, nil, pusher.Push, auditer, false, nil, retriever)
+
+		expectedNbCalls := 1
+
+		Convey("Then I should get a bahamut error and no context", func() {
+			So(err, ShouldNotEqual, nil)
+			So(err.Error(), ShouldEqual, "oh noes")
+			So(retrieverCalled, ShouldEqual, 1)
+			So(ctx.InputData, ShouldNotBeNil)
+			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
 		})
 	})
 }

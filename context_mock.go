@@ -25,7 +25,7 @@ type MockContext struct {
 	MockCtx                   context.Context
 	MockOutputData            any
 	MockInputData             any
-	MockOriginalData          any
+	MockOriginalData          elemental.Identifiable
 	MockMetadata              map[any]any
 	MockClaimsMap             map[string]string
 	MockResponseWriter        ResponseWriter
@@ -87,8 +87,13 @@ func (c *MockContext) SetInputData(data any) {
 }
 
 // OriginalData returns the context's original data.
-func (c *MockContext) OriginalData() any {
+func (c *MockContext) OriginalData() elemental.Identifiable {
 	return c.MockOriginalData
+}
+
+// SetOriginalData sets the context's original data.
+func (c *MockContext) SetOriginalData(identifiable elemental.Identifiable) {
+	c.MockOriginalData = identifiable
 }
 
 // OutputData returns the context's output data.

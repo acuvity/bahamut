@@ -212,6 +212,7 @@ func dispatchUpdateOperation(
 	auditer Auditer,
 	readOnlyMode bool,
 	readOnlyExclusion []elemental.Identity,
+	identifiableRetriever IdentifiableRetriever,
 ) (err error) {
 
 	if err = CheckAuthentication(authenticators, ctx); err != nil {
@@ -252,6 +253,22 @@ func dispatchUpdateOperation(
 				return elemental.NewError("Bad Request", err.Error(), "bahamut", http.StatusBadRequest)
 			}
 		}
+	}
+
+	if identifiableRetriever != nil {
+		identifiable, err := identifiableRetriever(ctx.Request())
+		if err != nil {
+			audit(auditer, ctx, err)
+			return err
+		}
+
+		if !identifiable.Identity().IsEqual(obj.Identity()) {
+			err := elemental.NewError("Bad Request", "Update and target do not have the same identity", "bahamut", http.StatusBadRequest)
+			audit(auditer, ctx, err)
+			return err
+		}
+
+		ctx.originalData = identifiable
 	}
 
 	if v, ok := obj.(elemental.Validatable); ok {

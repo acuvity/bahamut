@@ -132,7 +132,7 @@ func TestContext_Duplicate(t *testing.T) {
 		ctx := newContext(context.Background(), req)
 		ctx.SetCount(10)
 		ctx.SetInputData("input")
-		ctx.SetInputData("output")
+		ctx.SetOriginalData(od)
 		ctx.SetStatusCode(42)
 		ctx.AddMessage("a")
 		ctx.SetRedirect("laba")
