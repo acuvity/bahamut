@@ -339,6 +339,7 @@ func handleUpdate(ctx *bcontext, cfg config, processorFinder processorFinderFunc
 				cfg.model.readOnly,
 				cfg.model.readOnlyExcludedIdentities,
 				cfg.model.retriever,
+				cfg.model.disableObjectRetrieverForIdentities,
 			)
 		},
 		cfg.general.panicRecoveryDisabled,
@@ -472,6 +473,7 @@ func handlePatch(ctx *bcontext, cfg config, processorFinder processorFinderFunc,
 				cfg.model.readOnly,
 				cfg.model.readOnlyExcludedIdentities,
 				cfg.model.retriever,
+				cfg.model.disableObjectRetrieverForIdentities,
 			)
 		},
 		cfg.general.panicRecoveryDisabled,

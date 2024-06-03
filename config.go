@@ -92,12 +92,13 @@ type config struct {
 		enabled       bool
 	}
 	model struct {
-		modelManagers              map[int]elemental.ModelManager
-		unmarshallers              map[elemental.Identity]CustomUmarshaller
-		marshallers                map[elemental.Identity]CustomMarshaller
-		retriever                  IdentifiableRetriever
-		readOnlyExcludedIdentities []elemental.Identity
-		readOnly                   bool
+		modelManagers                       map[int]elemental.ModelManager
+		unmarshallers                       map[elemental.Identity]CustomUmarshaller
+		marshallers                         map[elemental.Identity]CustomMarshaller
+		retriever                           IdentifiableRetriever
+		disableObjectRetrieverForIdentities map[elemental.Identity]any
+		readOnlyExcludedIdentities          []elemental.Identity
+		readOnly                            bool
 	}
 	tls struct {
 		clientCAPool                    *x509.CertPool
