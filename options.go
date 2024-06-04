@@ -535,3 +535,14 @@ func OptErrorTransformer(f func(error) error) Option {
 		c.hooks.errorTransformer = f
 	}
 }
+
+// OptDisableObjectRetrieverForIdentities sets which identities will not automatically
+// retrieve the identifiable during the update and patch process.
+func OptDisableObjectRetrieverForIdentities(identities []elemental.Identity) Option {
+	return func(c *config) {
+		c.model.disableObjectRetrieverForIdentities = map[elemental.Identity]any{}
+		for _, i := range identities {
+			c.model.disableObjectRetrieverForIdentities[i] = nil
+		}
+	}
+}

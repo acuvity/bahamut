@@ -212,6 +212,8 @@ func dispatchUpdateOperation(
 	auditer Auditer,
 	readOnlyMode bool,
 	readOnlyExclusion []elemental.Identity,
+	identifiableRetriever IdentifiableRetriever,
+	disableRetrieverForIdentities map[elemental.Identity]any,
 ) (err error) {
 
 	if err = CheckAuthentication(authenticators, ctx); err != nil {
@@ -252,6 +254,22 @@ func dispatchUpdateOperation(
 				return elemental.NewError("Bad Request", err.Error(), "bahamut", http.StatusBadRequest)
 			}
 		}
+	}
+
+	if _, ok := disableRetrieverForIdentities[ctx.request.Identity]; !ok && identifiableRetriever != nil {
+		identifiable, err := identifiableRetriever(ctx.Request())
+		if err != nil {
+			audit(auditer, ctx, err)
+			return err
+		}
+
+		if !identifiable.Identity().IsEqual(obj.Identity()) {
+			err := elemental.NewError("Bad Request", "Update and target do not have the same identity", "bahamut", http.StatusBadRequest)
+			audit(auditer, ctx, err)
+			return err
+		}
+
+		ctx.originalData = identifiable
 	}
 
 	if v, ok := obj.(elemental.Validatable); ok {
@@ -349,6 +367,7 @@ func dispatchPatchOperation(
 	readOnlyMode bool,
 	readOnlyExclusion []elemental.Identity,
 	identifiableRetriever IdentifiableRetriever,
+	disableRetrieverForIdentities map[elemental.Identity]any,
 ) (err error) {
 
 	if err = CheckAuthentication(authenticators, ctx); err != nil {
@@ -369,7 +388,9 @@ func dispatchPatchOperation(
 
 	proc, _ := processorFinder(ctx.request.Identity)
 
-	if identifiableRetriever != nil {
+	_, shouldNotRetrieve := disableRetrieverForIdentities[ctx.request.Identity]
+
+	if !shouldNotRetrieve && identifiableRetriever != nil {
 		if _, ok := proc.(UpdateProcessor); !ok {
 			err = notImplementedErr(ctx.request)
 			audit(auditer, ctx, err)
@@ -397,7 +418,7 @@ func dispatchPatchOperation(
 		}
 	}
 
-	if identifiableRetriever != nil {
+	if !shouldNotRetrieve && identifiableRetriever != nil {
 		identifiable, err := identifiableRetriever(ctx.Request())
 		if err != nil {
 			audit(auditer, ctx, err)

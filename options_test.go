@@ -381,4 +381,10 @@ func TestBahamut_Options(t *testing.T) {
 		OptErrorTransformer(f)(&c)
 		So(c.hooks.errorTransformer, ShouldEqual, f)
 	})
+
+	Convey("Calling OptDisableObjectRetrieverForIdentities should work", t, func() {
+		identities := []elemental.Identity{testmodel.ListIdentity}
+		OptDisableObjectRetrieverForIdentities(identities)(&c)
+		So(c.model.disableObjectRetrieverForIdentities, ShouldResemble, map[elemental.Identity]any{testmodel.ListIdentity: nil})
+	})
 }

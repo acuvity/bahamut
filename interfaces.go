@@ -118,7 +118,10 @@ type Context interface {
 
 	// OriginalData returns the data that may have been retrieved using
 	// the configured IdentifiableRetriever during the Update process.
-	OriginalData() any
+	OriginalData() elemental.Identifiable
+
+	// SetOriginalData replaces the current original data.
+	SetOriginalData(elemental.Identifiable)
 
 	// OutputData returns the current output data.
 	OutputData() any

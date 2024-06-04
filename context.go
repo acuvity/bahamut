@@ -93,8 +93,12 @@ func (c *bcontext) SetInputData(data any) {
 	c.inputData = data
 }
 
-func (c *bcontext) OriginalData() any {
+func (c *bcontext) OriginalData() elemental.Identifiable {
 	return c.originalData
+}
+
+func (c *bcontext) SetOriginalData(identifiable elemental.Identifiable) {
+	c.originalData = identifiable
 }
 
 func (c *bcontext) OutputData() any {
