@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/armon/go-proxyproto"
-	"github.com/valyala/tcplisten"
 	"github.com/vulcand/oxy/v2/buffer"
 	"github.com/vulcand/oxy/v2/cbreaker"
 	"github.com/vulcand/oxy/v2/connlimit"
@@ -48,11 +47,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 	var listener net.Listener
 
-	rootListener, err := (&tcplisten.Config{
-		ReusePort:   true,
-		DeferAccept: true,
-		FastOpen:    true,
-	}).NewListener("tcp4", listenAddr)
+	rootListener, err := bahamut.MakeListener("tcp4", listenAddr)
 	if err != nil {
 		return nil, fmt.Errorf("unable build fast tcp listener: %s", err)
 	}

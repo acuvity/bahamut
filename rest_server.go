@@ -27,7 +27,6 @@ import (
 	"github.com/NYTimes/gziphandler"
 	"github.com/go-zoo/bone"
 	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/valyala/tcplisten"
 	"go.acuvity.ai/elemental"
 )
 
@@ -235,11 +234,7 @@ func (a *restServer) start(ctx context.Context, routesInfo map[int][]RouteInfo) 
 
 		listener := a.cfg.restServer.customListener
 		if listener == nil {
-			listener, err = (&tcplisten.Config{
-				ReusePort:   true,
-				DeferAccept: true,
-				FastOpen:    true,
-			}).NewListener("tcp4", a.server.Addr)
+			listener, err = MakeListener("tcp4", a.server.Addr)
 			if err != nil {
 				slog.Error("Unable to dial", err)
 				os.Exit(1)
