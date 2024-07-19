@@ -9,6 +9,7 @@ import (
 type notifierConfig struct {
 	rateLimits       IdentityToAPILimitersRegistry
 	privateOverrides map[string]bool
+	hiddenAPIs       map[string]bool
 	prefix           string
 	pingInterval     time.Duration
 }
@@ -18,6 +19,7 @@ func newNotifierConfig() notifierConfig {
 		rateLimits:       IdentityToAPILimitersRegistry{},
 		pingInterval:     5 * time.Second,
 		privateOverrides: map[string]bool{},
+		hiddenAPIs:       map[string]bool{},
 	}
 }
 
@@ -66,6 +68,20 @@ func OptionNotifierPrivateAPIOverrides(overrides map[elemental.Identity]bool) No
 	return func(c *notifierConfig) {
 		for k, v := range overrides {
 			c.privateOverrides[k.Category] = v
+		}
+	}
+}
+
+// OptionNotifierHiddenAPIs allows to pass a map of identity to boolean
+// that will be used to hide completely the API from the gateway.
+//
+// NOTE: this does not change the internal data in bahamut's server RouteInfo.
+// As far as bahamut server is concerned, the route Private flag did not
+// change. This is only affecting the gateway.
+func OptionNotifierHiddenAPIs(overrides map[elemental.Identity]bool) NotifierOption {
+	return func(c *notifierConfig) {
+		for k, v := range overrides {
+			c.hiddenAPIs[k.Category] = v
 		}
 	}
 }

@@ -16,6 +16,7 @@ type Notifier struct {
 	pubsub             bahamut.PubSubClient
 	limiters           IdentityToAPILimitersRegistry
 	privateOverrides   map[string]bool
+	hiddenAPIs         map[string]bool
 	serviceName        string
 	endpoint           string
 	serviceStatusTopic string
@@ -46,6 +47,7 @@ func NewNotifier(
 		frequency:          cfg.pingInterval,
 		prefix:             cfg.prefix,
 		privateOverrides:   cfg.privateOverrides,
+		hiddenAPIs:         cfg.hiddenAPIs,
 	}
 }
 
@@ -59,14 +61,22 @@ func (w *Notifier) MakeStartHook(ctx context.Context) func(server bahamut.Server
 			return err
 		}
 
-		routes := server.RoutesInfo()
-		for _, versionedRoutes := range routes {
+		routes := map[int][]bahamut.RouteInfo{}
+		pristineRoutes := server.RoutesInfo()
+		for v, versionedRoutes := range pristineRoutes {
 			for i, r := range versionedRoutes {
+				hidden, ok := w.hiddenAPIs[r.Identity]
+				if ok && hidden {
+					continue
+				}
+
 				priv, ok := w.privateOverrides[r.Identity]
 				if ok {
 					r.Private = priv
 					versionedRoutes[i] = r
 				}
+
+				routes[v] = append(routes[v], r)
 			}
 		}
 

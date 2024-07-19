@@ -39,4 +39,12 @@ func Test_NotiferOptions(t *testing.T) {
 		OptionNotifierPrivateAPIOverrides(ov)(&c)
 		So(c.privateOverrides, ShouldResemble, map[string]bool{"things": true})
 	})
+
+	Convey("Calling OpionNotifierHiddenAPI should work", t, func() {
+		ov := map[elemental.Identity]bool{
+			elemental.MakeIdentity("thing", "things"): true,
+		}
+		OptionNotifierHiddenAPIs(ov)(&c)
+		So(c.hiddenAPIs, ShouldResemble, map[string]bool{"things": true})
+	})
 }
