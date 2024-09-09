@@ -25,7 +25,6 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.1
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/valyala/tcplisten v1.0.0
-	github.com/vulcand/oxy v1.4.2
 	github.com/vulcand/oxy/v2 v2.0.0-20221121151423-d5cb734e4467
 	golang.org/x/time v0.5.0
 )

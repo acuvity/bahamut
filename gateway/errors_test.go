@@ -13,8 +13,8 @@ import (
 
 	"github.com/mailgun/multibuf"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/vulcand/oxy/ratelimit"
 	"github.com/vulcand/oxy/v2/connlimit"
+	"github.com/vulcand/oxy/v2/ratelimit"
 	"go.acuvity.ai/elemental"
 )
 
