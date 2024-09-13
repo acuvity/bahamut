@@ -94,6 +94,19 @@ func TestErrorHandler(t *testing.T) {
 			})
 		})
 
+		Convey("When I call ServeHTTP with net.Error that is a tls issue", func() {
+			ne := &fakeNetErr{
+				err: fmt.Errorf("tls: it sucks to be you"),
+			}
+			eh.ServeHTTP(w, req, ne)
+			data, _ := io.ReadAll(w.Body)
+			So(string(data), ShouldEqual, `[{"code":500,"description":"tls: it sucks to be you","subject":"gateway","title":"TLS Error"}]`)
+			So(w.Header(), ShouldResemble, http.Header{
+				"Access-Control-Allow-Origin": {"foo"},
+				"Content-Type":                {"application/json; charset=UTF-8"},
+			})
+		})
+
 		Convey("When I call ServeHTTP with a errRateLimit", func() {
 			eh.ServeHTTP(w, req, errTooManyRequest)
 			data, _ := io.ReadAll(w.Body)

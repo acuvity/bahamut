@@ -6,8 +6,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/mailgun/multibuf"
 	"github.com/vulcand/oxy/v2/connlimit"
@@ -86,6 +88,8 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 		return
 	}
 
+	slog.Debug("Handling http error", "err", err)
+
 	if s.corsOriginInjector != nil {
 		s.corsOriginInjector(w, r)
 	}
@@ -93,10 +97,18 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 	switch e := err.(type) {
 
 	case net.Error:
+
+		// Better logging that in any case. A silent TLS error is worst that anything else.
+		if strings.Contains(err.Error(), "tls: ") {
+			writeError(w, r, makeError(http.StatusInternalServerError, "TLS Error", err.Error()))
+			return
+		}
+
 		if e.Timeout() {
 			writeError(w, r, errGatewayTimeout)
 			return
 		}
+
 		writeError(w, r, errBadGateway)
 		return
 
@@ -108,7 +120,7 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 		writeError(w, r, makeError(http.StatusRequestEntityTooLarge, "Entity Too Large", fmt.Sprintf("Payload size exceeds the maximum allowed size (%d bytes)", e.MaxSize)))
 		return
 
-	case x509.UnknownAuthorityError, x509.HostnameError, x509.CertificateInvalidError, x509.ConstraintViolationError, *tls.CertificateVerificationError:
+	case x509.UnknownAuthorityError, x509.HostnameError, x509.CertificateInvalidError, x509.ConstraintViolationError, *tls.CertificateVerificationError, tls.AlertError, tls.RecordHeaderError, *tls.RecordHeaderError:
 		writeError(w, r, makeError(495, "TLS Error", err.Error()))
 		return
 	}
@@ -121,12 +133,14 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 	case errTooManyRequest:
 		writeError(w, r, errRateLimit)
 	default:
+
 		// the http package function MaxBytesReader is returning an error.erroString
 		// so we need to check its string value.
 		if err.Error() == "http: request body too large" {
 			writeError(w, r, makeError(http.StatusRequestEntityTooLarge, "Entity Too Large", err.Error()))
 			return
 		}
+
 		writeError(w, r, makeError(http.StatusInternalServerError, "Internal Server Error", err.Error()))
 	}
 }
