@@ -594,7 +594,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 			processorFinder,
 			testmodel.Manager(),
 			func(*elemental.Request) (elemental.Identifiable, error) {
-				return nil, fmt.Errorf(expectedError)
+				return nil, fmt.Errorf("%s", expectedError)
 			},
 			nil,
 			nil,
@@ -1026,7 +1026,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			processorFinder,
 			testmodel.Manager(),
 			func(*elemental.Request) (elemental.Identifiable, error) {
-				return nil, fmt.Errorf(expectedError)
+				return nil, fmt.Errorf("%s", expectedError)
 			},
 			nil,
 			nil,
@@ -1768,7 +1768,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 			processorFinder,
 			testmodel.Manager(),
 			func(*elemental.Request) (elemental.Identifiable, error) {
-				return nil, fmt.Errorf(expectedError)
+				return nil, fmt.Errorf("%s", expectedError)
 			},
 			nil,
 			nil,

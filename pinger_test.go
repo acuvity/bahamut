@@ -32,7 +32,7 @@ func Test_RetrieveHealthStatus(t *testing.T) {
 	Convey("Given the following pingers", t, func() {
 		pingers := map[string]Pinger{
 			"p1": MockPinger{PingStatus: nil},
-			"p2": MockPinger{PingStatus: fmt.Errorf(PingStatusTimeout)},
+			"p2": MockPinger{PingStatus: fmt.Errorf("%s", PingStatusTimeout)},
 			"p3": MockPinger{PingStatus: fmt.Errorf("Another status")},
 		}
 		results := RetrieveHealthStatus(time.Second, pingers)
@@ -60,7 +60,7 @@ func Test_stringifyStatus(t *testing.T) {
 
 	Convey("Given the stringifyStatus method", t, func() {
 		So(stringifyStatus(nil), ShouldEqual, PingStatusOK)
-		So(stringifyStatus(fmt.Errorf(PingStatusTimeout)), ShouldEqual, PingStatusTimeout)
+		So(stringifyStatus(fmt.Errorf("%s", PingStatusTimeout)), ShouldEqual, PingStatusTimeout)
 		So(stringifyStatus(fmt.Errorf("Another status")), ShouldEqual, PingStatusError)
 	})
 }
