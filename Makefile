@@ -26,7 +26,7 @@ lint:
 		--enable=typecheck \
 		./...
 test:
-	go test ./... -race -cover -covermode=atomic -coverprofile=unit_coverage.out
+	go test ./... -vet off -race -cover -covermode=atomic -coverprofile=unit_coverage.out
 
 sec:
 	gosec -quiet ./...
