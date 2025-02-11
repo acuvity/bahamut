@@ -51,7 +51,7 @@ func sanitizePath(url string) string {
 }
 
 type prometheusMetricsManager struct {
-	reqDurationMetric    *prometheus.SummaryVec
+	reqDurationMetric    *prometheus.HistogramVec
 	reqTotalMetric       *prometheus.CounterVec
 	errorMetric          *prometheus.CounterVec
 	tcpConnTotalMetric   prometheus.Counter
@@ -78,11 +78,11 @@ func newPrometheusMetricsManager(registerer prometheus.Registerer) MetricsManage
 			},
 			[]string{"method", "url", "code"},
 		),
-		reqDurationMetric: prometheus.NewSummaryVec(
-			prometheus.SummaryOpts{
-				Name:       "http_requests_duration_seconds",
-				Help:       "The average duration of the requests",
-				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		reqDurationMetric: prometheus.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Name:    "http_requests_duration_seconds",
+				Help:    "The average duration of the requests",
+				Buckets: []float64{0.001, 0.0025, 0.005, 0.010, 0.025, 0.050, 0.100, 0.250, 0.500, 1.0, 2.5, 5.0, 10.0},
 			},
 			[]string{"method", "url"},
 		),
