@@ -174,7 +174,6 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 			return nil
 		}
 
-		injectGeneralHeader(resp.Header)
 		injectCORSHeader(
 			resp.Header,
 			cfg.corsOrigin,
