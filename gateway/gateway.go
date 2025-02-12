@@ -347,6 +347,8 @@ func (s *gateway) checkInterceptor(
 
 func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
+	injectGeneralHeader(w.Header())
+
 	if r.Method == http.MethodOptions {
 		h := w.Header()
 		injectCORSHeader(
@@ -396,8 +398,8 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if interceptAction != 0 {
 			goto HANDLE_INTERCEPTION
 		}
-
 	}
+
 	// First we look for the exact match
 	if interceptAction, upstream, err = s.checkInterceptor(
 		s.gatewayConfig.exactInterceptors,
