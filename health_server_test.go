@@ -40,6 +40,9 @@ type testMetricsManager struct{}
 func (m *testMetricsManager) MeasureRequest(method string, path string) FinishMeasurementFunc {
 	return nil
 }
+func (m *testMetricsManager) MeasureGenericRequest(method string, path string) FinishMeasurementFunc {
+	return nil
+}
 func (m *testMetricsManager) RegisterWSConnection()    {}
 func (m *testMetricsManager) UnregisterWSConnection()  {}
 func (m *testMetricsManager) RegisterTCPConnection()   {}
