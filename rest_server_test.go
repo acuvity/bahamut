@@ -307,6 +307,9 @@ type mockMetricsManager struct {
 func (m *mockMetricsManager) MeasureRequest(method string, url string) FinishMeasurementFunc {
 	return m.measureFunc
 }
+func (m *mockMetricsManager) MeasureGenericRequest(method string, url string) FinishMeasurementFunc {
+	return m.measureFunc
+}
 func (m *mockMetricsManager) RegisterWSConnection()                        {}
 func (m *mockMetricsManager) UnregisterWSConnection()                      {}
 func (m *mockMetricsManager) RegisterTCPConnection()                       {}
