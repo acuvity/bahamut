@@ -1,11 +1,13 @@
 module go.acuvity.ai/bahamut
 
-go 1.21
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
-	go.acuvity.ai/elemental v0.0.0-20250114154951-59db3af44e2c
-	go.acuvity.ai/tg v0.0.0-20250109032659-01df62fd30d1
-	go.acuvity.ai/wsc v0.0.0-20250107185701-b84376bdb60b
+	go.acuvity.ai/elemental v0.0.0-20250226152430-c139902eba00
+	go.acuvity.ai/tg v0.0.0-20250220234315-d9494083aa3a
+	go.acuvity.ai/wsc v0.0.0-20250219220143-0153e5776946
 )
 
 require (
@@ -81,14 +83,14 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.acuvity.ai/regolithe v0.0.0-20250114154847-efb27183b9b1 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
+	go.acuvity.ai/regolithe v0.0.0-20250226152157-fbd9f24f9cec // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/term v0.29.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
