@@ -5,7 +5,8 @@ go 1.23.0
 toolchain go1.24.0
 
 require (
-	go.acuvity.ai/elemental v0.0.0-20250604155439-3dc9ecc6c0a3
+	go.acuvity.ai/elemental v0.0.0-20250611173736-15351f5833c4
+	go.acuvity.ai/regolithe v0.0.0-20250321141528-1fe83b60f317 // indirect
 	go.acuvity.ai/tg v0.0.0-20250220234315-d9494083aa3a
 	go.acuvity.ai/wsc v0.0.0-20250506232542-8de7ff436ec0
 )
@@ -38,7 +39,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.3 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cloudflare/circl v1.3.7 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.3.6 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -84,7 +85,6 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.acuvity.ai/regolithe v0.0.0-20250321141528-1fe83b60f317 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.39.0 // indirect

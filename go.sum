@@ -33,8 +33,8 @@ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
-github.com/cloudflare/circl v1.3.7 h1:qlCDlTPz2n9fu58M0Nh1J/JzcFpfgkFHHX3O35r5vcU=
-github.com/cloudflare/circl v1.3.7/go.mod h1:sRTcRWXGLrKw6yIGJ+l7amYJFfAXbZG0kBSc8r4zxgA=
+github.com/cloudflare/circl v1.6.1 h1:zqIqSPIndyBh1bjLVVDHMPpVKqp8Su/V+6MeDzzQBQ0=
+github.com/cloudflare/circl v1.6.1/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4/go.mod h1:6pvJx4me5XPnfI9Z40ddWsdw2W/uZgQLFXToKeRcDiI=
@@ -257,8 +257,8 @@ github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQ
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yusufpapurcu/wmi v1.2.2 h1:KBNDSne4vP5mbSWnJbO+51IMOXJB67QiYCSBrubbPRg=
 github.com/yusufpapurcu/wmi v1.2.2/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-go.acuvity.ai/elemental v0.0.0-20250604155439-3dc9ecc6c0a3 h1:43p/hKoudbfEUcOWQ2LLN0FO+jZRy7LzOTwtCoKRhhk=
-go.acuvity.ai/elemental v0.0.0-20250604155439-3dc9ecc6c0a3/go.mod h1:6sWLDNB3zDfgwM3cgcmbzPjjeHyoglEOJ2GWV2UqS9s=
+go.acuvity.ai/elemental v0.0.0-20250611173736-15351f5833c4 h1:wW5cv7GEiQpkFYF+bHFrR32ejU51r0Zk5SKy2SZBpGM=
+go.acuvity.ai/elemental v0.0.0-20250611173736-15351f5833c4/go.mod h1:423bloymvuHtCppp0BwsI2zPcbjPjdAB36+LYZTAiXA=
 go.acuvity.ai/regolithe v0.0.0-20250321141528-1fe83b60f317 h1:zNRhRowG4yQgncNdR/IBZBhLskcc4W30QOWzpVVOZzM=
 go.acuvity.ai/regolithe v0.0.0-20250321141528-1fe83b60f317/go.mod h1:hYoJkZRbNRpHKMNtNiugQDu6emXrhHP/Es5xAX35O2Y=
 go.acuvity.ai/tg v0.0.0-20250220234315-d9494083aa3a h1:oqIMPF2BTBRgjiUQCFcmulceL9MjrVnjmd0F9v9VDz0=

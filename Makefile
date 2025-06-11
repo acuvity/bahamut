@@ -5,28 +5,36 @@ export GO111MODULE = on
 
 default: lint test
 
+install-tools:
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	go install github.com/securego/gosec/cmd/gosec@master
+
 lint:
 	golangci-lint run \
 		--timeout=5m \
-		--disable-all \
-		--exclude-use-default=false \
-		--exclude=package-comments \
-		--exclude=unused-parameter \
-		--exclude=dot-imports \
+		--disable=govet  \
 		--enable=errcheck \
-		--enable=goimports \
 		--enable=ineffassign \
-		--enable=revive \
 		--enable=unused \
-		--enable=staticcheck \
 		--enable=unconvert \
 		--enable=misspell \
 		--enable=prealloc \
 		--enable=nakedret \
-		--enable=typecheck \
+		--enable=unparam \
+		--enable=nilerr \
+		--enable=bodyclose \
+		--enable=errorlint \
 		./...
+
 test:
 	go test ./... -vet off -race -cover -covermode=atomic -coverprofile=unit_coverage.out
 
 sec:
 	gosec -quiet ./...
+
+remod:
+	go get go.acuvity.ai/elemental@master
+	go get go.acuvity.ai/regolithe@master
+	go get go.acuvity.ai/tg@master
+	go get go.acuvity.ai/wsc@master
+	go mod tidy
