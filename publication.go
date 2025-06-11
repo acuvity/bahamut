@@ -61,7 +61,7 @@ type Publication struct {
 	Encoding     elemental.EncodingType `msgpack:"encoding,omitempty" json:"encoding,omitempty"`
 	Data         []byte                 `msgpack:"data,omitempty" json:"data,omitempty"`
 	ResponseMode ResponseMode           `msgpack:"responseMode,omitempty" json:"responseMode,omitempty"`
-	mux          sync.Mutex
+	mux          sync.RWMutex
 	Partition    int32 `msgpack:"partition,omitempty" json:"partition,omitempty"`
 	replied      bool
 	timedOut     bool
@@ -88,6 +88,9 @@ func (p *Publication) EncodeWithEncoding(o any, encoding elemental.EncodingType)
 	if err != nil {
 		return err
 	}
+
+	p.mux.Lock()
+	defer p.mux.Unlock()
 
 	p.Data = data
 	p.Encoding = encoding
@@ -147,6 +150,9 @@ func (p *Publication) Span() opentracing.Span {
 
 // Duplicate returns a copy of the publication
 func (p *Publication) Duplicate() *Publication {
+
+	p.mux.RLock()
+	defer p.mux.RUnlock()
 
 	pub := NewPublication(p.Topic)
 	pub.Data = p.Data
