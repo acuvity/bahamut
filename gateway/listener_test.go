@@ -107,7 +107,7 @@ func TestLimitLimiter(t *testing.T) {
 
 			c, err := ll.Accept()
 
-			Convey("Then err should be nil", func() {
+			Convey("Then err should not be nil", func() {
 				So(err, ShouldNotBeNil)
 				So(err.Error(), ShouldEqual, "boom")
 			})
@@ -135,7 +135,7 @@ func TestLimitLimiter(t *testing.T) {
 			// this one should be closed because rate limited
 			conn, _ := ll.Accept()
 
-			Convey("Then err should be nil", func() {
+			Convey("Then conn should be closed", func() {
 				So(conn.(*fakeConn).closed, ShouldBeTrue)
 				So(mm.total, ShouldBeGreaterThanOrEqualTo, 1)
 				So(mm.accepted, ShouldBeGreaterThanOrEqualTo, 1)

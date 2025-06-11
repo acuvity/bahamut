@@ -12,7 +12,7 @@ import (
 // instruct the bahamut.Gateway to return to stop
 // routing and return a a 429 Too Many Request error to
 // the client.
-var ErrUpstreamerTooManyRequests = errors.New("Please retry in a moment")
+var ErrUpstreamerTooManyRequests = errors.New("please retry in a moment")
 
 // An Upstreamer is the interface that can compute upstreams.
 type Upstreamer interface {

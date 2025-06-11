@@ -162,6 +162,7 @@ func TestGateway(t *testing.T) {
 				req.Close = true
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 601)
 			})
 
@@ -170,6 +171,7 @@ func TestGateway(t *testing.T) {
 				req.Close = true
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 602)
 			})
 
@@ -178,6 +180,7 @@ func TestGateway(t *testing.T) {
 				req.Close = true
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 503)
 			})
 
@@ -187,6 +190,7 @@ func TestGateway(t *testing.T) {
 				req.Close = true
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, http.StatusTooManyRequests)
 			})
 
@@ -196,6 +200,7 @@ func TestGateway(t *testing.T) {
 				req.Close = true
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, http.StatusInternalServerError)
 			})
 
@@ -234,6 +239,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 423)
 			})
 
@@ -241,6 +247,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodOptions, "http://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 200)
 			})
 		})
@@ -281,6 +288,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 601)
 				So(resp.Header.Get("inject"), ShouldEqual, "hello")
 				So(resp.Header.Get("from-response"), ShouldEqual, "hello")
@@ -319,6 +327,7 @@ func TestGateway(t *testing.T) {
 				req.Header.Set("origin", "orig")
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 604)
 				So(resp.Header.Get("Access-Control-Allow-Origin"), ShouldEqual, "orig")
 				So(resp.Header.Get("Access-Control-Expose-Headers"), ShouldNotBeEmpty)
@@ -329,6 +338,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/hello", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 604)
 				So(resp.Header.Get("Access-Control-Allow-Origin"), ShouldBeEmpty)
 				So(resp.Header.Get("Access-Control-Expose-Headers"), ShouldNotBeEmpty)
@@ -366,6 +376,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 602)
 			})
 		})
@@ -401,6 +412,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/chien/hello", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 604)
 			})
 		})
@@ -435,6 +447,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/chien/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 602)
 			})
 		})
@@ -471,6 +484,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "http://127.0.0.1:7765/ups1/chien", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 500)
 			})
 		})
@@ -505,6 +519,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "https://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 601)
 			})
 
@@ -512,6 +527,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "https://127.0.0.1:7765/ups2", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 602)
 			})
 		})
@@ -545,6 +561,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "https://127.0.0.1:7765/ups1", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 601)
 			})
 
@@ -552,6 +569,7 @@ func TestGateway(t *testing.T) {
 				req, _ := http.NewRequest(http.MethodGet, "https://127.0.0.1:7765/ups2", nil)
 				resp, err := testclient.Do(req)
 				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
 				So(resp.StatusCode, ShouldEqual, 602)
 			})
 		})

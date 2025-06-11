@@ -13,10 +13,10 @@ package bahamut
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -449,8 +449,7 @@ func (n *pushServer) start(ctx context.Context) {
 					if n.cfg.pushServer.dispatchHandler != nil {
 						dispatch, err := n.cfg.pushServer.dispatchHandler.ShouldDispatch(session, event, eventSummary)
 						if err != nil {
-							// temp before we move to error wrapping
-							if err != context.Canceled && !strings.Contains(err.Error(), "context canceled") {
+							if !errors.Is(err, context.Canceled) {
 								slog.Error("Error while calling dispatchHandler.ShouldDispatch", err)
 							}
 
@@ -505,32 +504,32 @@ func prepareEventData(event *elemental.Event) (msgpack []byte, json []byte, err 
 
 		msgpack, err = elemental.Encode(elemental.EncodingTypeMSGPACK, event)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unable to encode original msgpack event: %s", err)
+			return nil, nil, fmt.Errorf("unable to encode original msgpack event: %w", err)
 		}
 
 		if err = eventCopy.Convert(elemental.EncodingTypeJSON); err != nil {
-			return nil, nil, fmt.Errorf("unable to convert original msgpack encoding to json: %s", err)
+			return nil, nil, fmt.Errorf("unable to convert original msgpack encoding to json: %w", err)
 		}
 
 		json, err = elemental.Encode(elemental.EncodingTypeJSON, eventCopy)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unable to encode json version of original msgpack event: %s", err)
+			return nil, nil, fmt.Errorf("unable to encode json version of original msgpack event: %w", err)
 		}
 
 	case elemental.EncodingTypeJSON:
 
 		json, err = elemental.Encode(elemental.EncodingTypeJSON, event)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unable to encode original json event: %s", err)
+			return nil, nil, fmt.Errorf("unable to encode original json event: %w", err)
 		}
 
 		if err = eventCopy.Convert(elemental.EncodingTypeMSGPACK); err != nil {
-			return nil, nil, fmt.Errorf("unable to convert original json encoding to msgpack: %s", err)
+			return nil, nil, fmt.Errorf("unable to convert original json encoding to msgpack: %w", err)
 		}
 
 		msgpack, err = elemental.Encode(elemental.EncodingTypeMSGPACK, eventCopy)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unable to encode msgpack version of original json event: %s", err)
+			return nil, nil, fmt.Errorf("unable to encode msgpack version of original json event: %w", err)
 		}
 	}
 

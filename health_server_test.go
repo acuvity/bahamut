@@ -65,6 +65,9 @@ func TestHealthServer(t *testing.T) {
 		time.Sleep(1 * time.Second)
 
 		resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d", port))
+		if err == nil {
+			defer func() { _ = resp.Body.Close() }()
+		}
 
 		Convey("Result should be correct", func() {
 			So(err, ShouldBeNil)
@@ -87,6 +90,9 @@ func TestHealthServer(t *testing.T) {
 		time.Sleep(1 * time.Second)
 
 		resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d/metrics", port))
+		if err == nil {
+			defer func() { _ = resp.Body.Close() }()
+		}
 
 		Convey("Result should be correct", func() {
 			So(err, ShouldBeNil)
@@ -109,6 +115,9 @@ func TestHealthServer(t *testing.T) {
 		time.Sleep(1 * time.Second)
 
 		resp, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d/something", port))
+		if err == nil {
+			defer func() { _ = resp.Body.Close() }()
+		}
 
 		Convey("Result should be correct", func() {
 			So(err, ShouldBeNil)
@@ -131,6 +140,9 @@ func TestHealthServer(t *testing.T) {
 		time.Sleep(1 * time.Second)
 
 		resp, err := http.Post(fmt.Sprintf("http://127.0.0.1:%d/something", port), "", nil)
+		if err == nil {
+			defer func() { _ = resp.Body.Close() }()
+		}
 
 		Convey("Result should be correct", func() {
 			So(err, ShouldBeNil)
@@ -155,6 +167,9 @@ func TestHealthServer(t *testing.T) {
 		<-hs.stop().Done()
 
 		resp, err := http.Post(fmt.Sprintf("http://127.0.0.1:%d/something", port), "", nil)
+		if err == nil {
+			defer func() { _ = resp.Body.Close() }()
+		}
 
 		Convey("Result should be correct", func() {
 			So(err, ShouldNotBeNil)
@@ -196,6 +211,8 @@ func TestHealthServerWithCustomHandler(t *testing.T) {
 				So(err, ShouldBeNil)
 			})
 
+			defer func() { _ = resp.Body.Close() }()
+
 			Convey("Then code should be 500", func() {
 				So(resp.StatusCode, ShouldEqual, http.StatusInternalServerError)
 			})
@@ -208,6 +225,8 @@ func TestHealthServerWithCustomHandler(t *testing.T) {
 			Convey("Then err should be nil", func() {
 				So(err, ShouldBeNil)
 			})
+
+			defer func() { _ = resp.Body.Close() }()
 
 			Convey("Then code should be 418", func() {
 				So(resp.StatusCode, ShouldEqual, http.StatusTeapot)
@@ -222,6 +241,8 @@ func TestHealthServerWithCustomHandler(t *testing.T) {
 				So(err, ShouldBeNil)
 			})
 
+			defer func() { _ = resp.Body.Close() }()
+
 			Convey("Then code should be 418", func() {
 				So(resp.StatusCode, ShouldEqual, http.StatusTeapot)
 			})
@@ -234,6 +255,8 @@ func TestHealthServerWithCustomHandler(t *testing.T) {
 			Convey("Then err should be nil", func() {
 				So(err, ShouldBeNil)
 			})
+
+			defer func() { _ = resp.Body.Close() }()
 
 			Convey("Then code should be 404", func() {
 				So(resp.StatusCode, ShouldEqual, http.StatusNotFound)

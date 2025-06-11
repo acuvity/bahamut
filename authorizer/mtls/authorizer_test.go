@@ -118,8 +118,9 @@ func TestBahamut_MTLSAuthorizer(t *testing.T) {
 
 			action, err := auth.IsAuthorized(ctx)
 
-			Convey("Then err should be nil", func() {
-				So(err, ShouldBeNil)
+			Convey("Then err should not be nil", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "no valid certificate found in header")
 			})
 
 			Convey("Then action should be bahamut.AuthActionKO", func() {
@@ -170,8 +171,9 @@ func TestBahamut_MTLSAuthorizer(t *testing.T) {
 
 			action, err := auth.IsAuthorized(ctx)
 
-			Convey("Then err should be nil", func() {
-				So(err, ShouldBeNil)
+			Convey("Then err should not be nil", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "no valid certificate found in tls state or header")
 			})
 
 			Convey("Then action should be bahamut.AuthActionKO", func() {
@@ -317,8 +319,9 @@ func TestBahamut_MTLSAuthorizer(t *testing.T) {
 
 			action, err := auth.IsAuthorized(ctx)
 
-			Convey("Then err should be nil", func() {
-				So(err, ShouldBeNil)
+			Convey("Then err should not be nil", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "no valid certificate found in tls state or header")
 			})
 
 			Convey("Then action should be bahamut.AuthActionOK", func() {

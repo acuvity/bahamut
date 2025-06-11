@@ -460,7 +460,7 @@ func TestHandlers_makeErrorResponse(t *testing.T) {
 
 			r := makeErrorResponse(context.Background(), resp, err, nil,
 				func(err error) error {
-					return fmt.Errorf("decorated: %s", err)
+					return fmt.Errorf("decorated: %w", err)
 				},
 			)
 
@@ -521,7 +521,7 @@ func TestHandlers_runDispatcher(t *testing.T) {
 
 		response := elemental.NewResponse(elemental.NewRequest())
 
-		d := func() error {
+		d := func() error { // nolint: unparam
 			calledCounter.Add(1)
 			return nil
 		}
@@ -579,7 +579,7 @@ func TestHandlers_runDispatcher(t *testing.T) {
 
 		response := elemental.NewResponse(elemental.NewRequest())
 
-		d := func() error {
+		d := func() error { // nolint: unparam
 			calledCounter.Add(1)
 			panic("booom!")
 		}
@@ -608,7 +608,7 @@ func TestHandlers_runDispatcher(t *testing.T) {
 
 		response := elemental.NewResponse(elemental.NewRequest())
 
-		d := func() error {
+		d := func() error { // nolint: unparam
 			calledCounter.Add(1)
 			panic("booom!")
 		}
@@ -630,7 +630,7 @@ func TestHandlers_runDispatcher(t *testing.T) {
 		ctx.request = elemental.NewRequest()
 		ctx.ctx = gctx
 
-		d := func() error {
+		d := func() error { // nolint: unparam
 			time.Sleep(300 * time.Millisecond)
 			calledCounter.Add(1)
 			return nil
@@ -660,7 +660,7 @@ func TestHandlers_handleRetrieveMany(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -722,7 +722,7 @@ func TestHandlers_handleRetrieve(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -784,7 +784,7 @@ func TestHandlers_handleCreate(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -846,7 +846,7 @@ func TestHandlers_handleUpdate(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -908,7 +908,7 @@ func TestHandlers_handleDelete(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -970,7 +970,7 @@ func TestHandlers_handleInfo(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}
@@ -1032,7 +1032,7 @@ func TestHandlers_handlePatch(t *testing.T) {
 		Convey("Given I a have fake processor finder that return no error", func() {
 
 			calledCounter := &counter{}
-			pf := func(identity elemental.Identity) (Processor, error) {
+			pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				calledCounter.Add(1)
 				return struct{}{}, nil
 			}

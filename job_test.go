@@ -31,7 +31,7 @@ func TestJob_RunJob(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		j := func() error {
+		j := func() error { // nolint: unparam
 			l.Lock()
 			called++
 			l.Unlock()

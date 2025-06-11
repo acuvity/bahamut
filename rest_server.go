@@ -15,6 +15,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -33,11 +34,11 @@ import (
 var (
 	// ErrInvalidAPIVersion is returned when the url cannot be parsed
 	// to find a valid version.
-	ErrInvalidAPIVersion = elemental.NewError("Bad Request", fmt.Sprintf("Invalid api version number"), "bahamut", http.StatusBadRequest)
+	ErrInvalidAPIVersion = elemental.NewError("Bad Request", "Invalid api version number", "bahamut", http.StatusBadRequest)
 
 	// ErrUnknownAPIVersion when there is no elemental.ModelManager configured
 	// to handle the requested version of the api.
-	ErrUnknownAPIVersion = elemental.NewError("Bad Request", fmt.Sprintf("Unknown api version"), "bahamut", http.StatusBadRequest)
+	ErrUnknownAPIVersion = elemental.NewError("Bad Request", "Unknown api version", "bahamut", http.StatusBadRequest)
 )
 
 // an restServer is the structure serving the api routes.
@@ -250,7 +251,7 @@ func (a *restServer) start(ctx context.Context, routesInfo map[int][]RouteInfo) 
 		}
 
 		if err != nil {
-			if err == http.ErrServerClosed {
+			if errors.Is(err, http.ErrServerClosed) {
 				return
 			}
 			slog.Error("Unable to start api server", err)

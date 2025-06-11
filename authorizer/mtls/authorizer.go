@@ -214,7 +214,7 @@ func (a *mtlsVerifier) IsAuthorized(ctx bahamut.Context) (bahamut.AuthAction, er
 	}
 
 	if err != nil {
-		return a.deciderFunc(bahamut.AuthActionKO, ctx, nil), nil
+		return a.deciderFunc(bahamut.AuthActionKO, ctx, nil), err
 	}
 
 	// If we can verify, we return the success auth action.
@@ -232,28 +232,22 @@ func (a *mtlsVerifier) IsAuthorized(ctx bahamut.Context) (bahamut.AuthAction, er
 
 func (a *mtlsVerifier) AuthenticateRequest(ctx bahamut.Context) (bahamut.AuthAction, error) {
 
-	ac, err := a.checkAction(ctx.Request().TLSConnectionState, ctx.Request().Headers.Get(tlsHeaderKey), ctx.SetClaims)
-	if err != nil {
-		return bahamut.AuthActionKO, err
-	}
+	ac := a.checkAction(ctx.Request().TLSConnectionState, ctx.Request().Headers.Get(tlsHeaderKey), ctx.SetClaims)
 
 	return a.deciderFunc(ac, ctx, nil), nil
 }
 
 func (a *mtlsVerifier) AuthenticateSession(session bahamut.Session) (bahamut.AuthAction, error) {
 
-	ac, err := a.checkAction(session.TLSConnectionState(), "", session.SetClaims)
-	if err != nil {
-		return bahamut.AuthActionKO, err
-	}
+	ac := a.checkAction(session.TLSConnectionState(), "", session.SetClaims)
 
 	return a.deciderFunc(ac, nil, session), nil
 }
 
-func (a *mtlsVerifier) checkAction(tlsState *tls.ConnectionState, headerCert string, claimSetter func([]string)) (bahamut.AuthAction, error) {
+func (a *mtlsVerifier) checkAction(tlsState *tls.ConnectionState, headerCert string, claimSetter func([]string)) bahamut.AuthAction {
 
 	if tlsState == nil && headerCert == "" {
-		return bahamut.AuthActionContinue, nil
+		return bahamut.AuthActionContinue
 	}
 
 	var certs []*x509.Certificate
@@ -271,7 +265,7 @@ func (a *mtlsVerifier) checkAction(tlsState *tls.ConnectionState, headerCert str
 	}
 
 	if err != nil {
-		return bahamut.AuthActionKO, nil
+		return bahamut.AuthActionKO
 	}
 
 	// If we can verify, we return the success auth action
@@ -279,13 +273,13 @@ func (a *mtlsVerifier) checkAction(tlsState *tls.ConnectionState, headerCert str
 		if _, err := cert.Verify(a.verifyOptions); err == nil {
 			if a.verifier == nil || a.verifier(cert) {
 				claimSetter(makeClaims(cert))
-				return bahamut.AuthActionOK, nil
+				return bahamut.AuthActionOK
 			}
 		}
 	}
 
 	// If we can't verify, we return the failure auth action.
-	return bahamut.AuthActionKO, nil
+	return bahamut.AuthActionKO
 }
 
 func decodeCertHeader(header string) ([]*x509.Certificate, error) {
@@ -294,7 +288,7 @@ func decodeCertHeader(header string) ([]*x509.Certificate, error) {
 		return nil, errors.New("invalid certificate in header")
 	}
 	// TODO: support multiple of them.
-	header = fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", strings.Replace(header[28:len(header)-26], " ", "\n", -1))
+	header = fmt.Sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----", strings.ReplaceAll(header[28:len(header)-26], " ", "\n"))
 
 	var certs []*x509.Certificate
 	var pemBlock *pem.Block

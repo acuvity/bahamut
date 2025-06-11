@@ -34,14 +34,14 @@ func makeProxyProtocolSourceChecker(allowed string) (func(net.Addr) (bool, error
 
 	_, allowedSubnet, err := net.ParseCIDR(allowed)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse CIDR: %s", err)
+		return nil, fmt.Errorf("unable to parse CIDR: %w", err)
 	}
 
 	return func(addr net.Addr) (bool, error) {
 
 		ipstr, _, err := net.SplitHostPort(addr.String())
 		if err != nil {
-			return false, fmt.Errorf("unable to parse net.Addr: %s", err)
+			return false, fmt.Errorf("unable to parse net.Addr: %w", err)
 		}
 
 		return allowedSubnet.Contains(net.ParseIP(ipstr)), nil

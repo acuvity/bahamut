@@ -53,7 +53,7 @@ func TestLimitListener(t *testing.T) {
 			c := http.Client{Timeout: 3 * time.Second}
 			r, err := c.Get("http://" + l.Addr().String())
 			if err != nil {
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					t.Log(err)
 					atomic.AddInt32(&failed, 1)
 				}
@@ -91,7 +91,7 @@ func TestLimitListenerError(t *testing.T) {
 		ll := newListener(errorListener{}, 2)
 		for i := 0; i < n+1; i++ {
 			_, err := ll.Accept()
-			if err != errFake {
+			if !errors.Is(err, errFake) {
 				panic(fmt.Sprintf("Accept error = %v; want errFake", err))
 			}
 		}

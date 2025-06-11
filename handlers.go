@@ -13,6 +13,7 @@ package bahamut
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -117,7 +118,7 @@ func makeResponse(ctx *bcontext, response *elemental.Response, marshallers map[e
 
 func makeErrorResponse(ctx context.Context, response *elemental.Response, err error, marshallers map[elemental.Identity]CustomMarshaller, errorTransformer func(error) error) *elemental.Response {
 
-	if err == context.Canceled || err == context.DeadlineExceeded {
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return nil
 	}
 

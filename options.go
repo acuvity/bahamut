@@ -138,7 +138,7 @@ func OptEnableAPIPathPrefix(prefix string) Option {
 			panic(fmt.Sprintf("Invalid API prefix provided: %s error: %s", prefix, err))
 		}
 		if u.Host != "" || u.Scheme != "" {
-			panic(fmt.Sprintf("API route prefix must not include host or scheme"))
+			panic("API route prefix must not include host or scheme")
 		}
 
 		c.restServer.apiPrefix = u.Path

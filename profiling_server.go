@@ -13,6 +13,7 @@ package bahamut
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"net/http/pprof"
@@ -50,7 +51,7 @@ func (s *profilingServer) start(ctx context.Context) {
 
 	go func() {
 		if err := s.server.ListenAndServe(); err != nil {
-			if err == http.ErrServerClosed {
+			if errors.Is(err, http.ErrServerClosed) {
 				return
 			}
 			slog.Error("Unable to start profiling server", err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -94,7 +95,7 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 		s.corsOriginInjector(w, r)
 	}
 
-	switch e := err.(type) {
+	switch e := err.(type) { // nolint: errorlint
 
 	case net.Error:
 
@@ -125,12 +126,12 @@ func (s *errorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request, err err
 		return
 	}
 
-	switch err {
-	case io.EOF:
+	switch {
+	case errors.Is(err, io.EOF):
 		writeError(w, r, errBadGateway)
-	case context.Canceled:
+	case errors.Is(err, context.Canceled):
 		writeError(w, r, errClientClosedConnection)
-	case errTooManyRequest:
+	case errors.Is(err, errTooManyRequest):
 		writeError(w, r, errRateLimit)
 	default:
 

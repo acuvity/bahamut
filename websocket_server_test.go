@@ -136,7 +136,7 @@ func TestWebsocketServer_newWebsocketServer(t *testing.T) {
 
 	Convey("Given I have a processor finder", t, func() {
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -182,7 +182,7 @@ func TestWebsockerServer_SessionRegistration(t *testing.T) {
 
 	Convey("Given I have a websocket server", t, func() {
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -246,7 +246,7 @@ func TestWebsocketServer_authSession(t *testing.T) {
 
 	Convey("Given I have a websocket server", t, func() {
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -328,7 +328,7 @@ func TestWebsocketServer_initPushSession(t *testing.T) {
 
 	Convey("Given I have a websocket server", t, func() {
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -410,7 +410,7 @@ func TestWebsocketServer_pushEvents(t *testing.T) {
 
 	Convey("Given I have a websocket server", t, func() {
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -557,7 +557,7 @@ func TestWebsocketServer_pushEvents(t *testing.T) {
 
 func TestWebsocketServer_start(t *testing.T) {
 
-	pf := func(identity elemental.Identity) (Processor, error) {
+	pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 		return struct{}{}, nil
 	}
 
@@ -1181,7 +1181,7 @@ func TestWebsocketServer_handleRequest(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
 
-		pf := func(identity elemental.Identity) (Processor, error) {
+		pf := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return struct{}{}, nil
 		}
 
@@ -1216,6 +1216,7 @@ func TestWebsocketServer_handleRequest(t *testing.T) {
 			Convey("Then err should should be nil", func() {
 				So(err, ShouldBeNil)
 			})
+			defer func() { _ = resp.Body.Close() }()
 			defer ws.Close(0) // nolint
 
 			Convey("Then resp should should be correct", func() {
@@ -1231,7 +1232,7 @@ func TestWebsocketServer_handleRequest(t *testing.T) {
 			pushHandler.onPushSessionInitOK = true
 			pushHandler.Unlock()
 
-			ws, resp, err := wsc.Connect(ctx, strings.Replace(ts.URL, "http://", "ws://", 1), wsc.Config{
+			ws, resp, err := wsc.Connect(ctx, strings.Replace(ts.URL, "http://", "ws://", 1), wsc.Config{ // nolint: bodyclose
 				Headers: http.Header{"X-Forwarded-For": []string{"12.12.12.12"}},
 			})
 
@@ -1256,7 +1257,7 @@ func TestWebsocketServer_handleRequest(t *testing.T) {
 			pushHandler.onPushSessionInitOK = false
 			pushHandler.Unlock()
 
-			ws, resp, err := wsc.Connect(ctx, strings.Replace(ts.URL, "http://", "ws://", 1), wsc.Config{})
+			ws, resp, err := wsc.Connect(ctx, strings.Replace(ts.URL, "http://", "ws://", 1), wsc.Config{}) // nolint: bodyclose
 
 			Convey("Then ws should be nil", func() {
 				So(ws, ShouldBeNil)

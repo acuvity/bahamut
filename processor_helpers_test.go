@@ -13,6 +13,7 @@ package bahamut
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"testing"
 
@@ -62,7 +63,9 @@ func TestProcessorHelpers_checkAuthenticated(t *testing.T) {
 			})
 
 			Convey("Then the http status should be 500", func() {
-				So(err.(elemental.Error).Code, ShouldEqual, 401)
+				var elemErr elemental.Error
+				So(errors.As(err, &elemErr), ShouldBeTrue)
+				So(elemErr.Code, ShouldEqual, 401)
 			})
 		})
 
@@ -154,7 +157,9 @@ func TestProcessorHelpers_checkAuthorized(t *testing.T) {
 			})
 
 			Convey("Then the http status should be 403", func() {
-				So(err.(elemental.Error).Code, ShouldEqual, 403)
+				var elemErr elemental.Error
+				So(errors.As(err, &elemErr), ShouldBeTrue)
+				So(elemErr.Code, ShouldEqual, 403)
 			})
 		})
 
@@ -170,7 +175,9 @@ func TestProcessorHelpers_checkAuthorized(t *testing.T) {
 			})
 
 			Convey("Then the http status should be 500", func() {
-				So(err.(elemental.Error).Code, ShouldEqual, 500)
+				var elemErr elemental.Error
+				So(errors.As(err, &elemErr), ShouldBeTrue)
+				So(elemErr.Code, ShouldEqual, 500)
 			})
 		})
 

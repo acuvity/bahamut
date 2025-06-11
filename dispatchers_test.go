@@ -14,6 +14,7 @@ package bahamut
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -29,7 +30,7 @@ func TestDispatchers_dispatchRetrieveManyOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieveMany function", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: "hello",
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventUpdate, &testmodel.List{})},
@@ -56,7 +57,7 @@ func TestDispatchers_dispatchRetrieveManyOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieveMany function with error", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -81,7 +82,7 @@ func TestDispatchers_dispatchRetrieveManyOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -102,7 +103,7 @@ func TestDispatchers_dispatchRetrieveManyOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieveMany function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -133,7 +134,7 @@ func TestDispatchers_dispatchRetrieveManyOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieveMany function and an authorizer that is not authorize", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -177,7 +178,7 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieve function", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: "hello",
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventUpdate, &testmodel.List{})},
@@ -204,7 +205,7 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessRetrieve function with error", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -229,7 +230,7 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -250,7 +251,7 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessRetrieve function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -281,7 +282,7 @@ func TestDispatchers_dispatchRetrieveOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessRetrieve function and an authorizer that is not authorize", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -327,7 +328,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventUpdate, &testmodel.List{})},
@@ -371,7 +372,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		Convey("Given a processor that can handle ProcessCreate function with a context output that does not satisfy the elemental.Identifiable interface", func() {
 
 			var err error
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output will NOT satisfy the elemental.Identifiable interface
 					output: json.RawMessage("some random bytes!"),
@@ -394,7 +395,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		Convey("Given a processor that can handle ProcessCreate function with a context that disables output data push", func() {
 
 			var err error
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					output: testmodel.NewList(),
 				}, nil
@@ -422,7 +423,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 			ctx.SetOutputData(testIdentifiable)
 
 			var err error
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output satisfies the elemental.Identifiable interface
 					output: testIdentifiable,
@@ -447,7 +448,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -458,7 +459,9 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 
 		Convey("Then I should have a 423 error and context should be nil", func() {
 			So(err, ShouldNotBeNil)
-			So(err.(elemental.Error).Code, ShouldEqual, http.StatusLocked)
+			var elemErr elemental.Error
+			So(errors.As(err, &elemErr), ShouldBeTrue)
+			So(elemErr.Code, ShouldEqual, http.StatusLocked)
 		})
 	})
 
@@ -467,7 +470,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -491,7 +494,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -513,7 +516,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`An invalid JSON`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -536,7 +539,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Identity = testmodel.TaskIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "status": "not-good"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -559,7 +562,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -582,7 +585,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 		request.Operation = elemental.OperationCreate
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -612,7 +615,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessCreate function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -643,7 +646,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessCreate function and an authorizer that is not authorized", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -689,7 +692,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -732,7 +735,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		// bug fix: https://github.com/aporeto-inc/bahamut/issues/64
 		Convey("Given I have a processor that handle ProcessUpdate function with a context output that does not satisfy elemental.Identifiable", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output will NOT satisfy the elemental.Identifiable interface
 					output: json.RawMessage("some random bytes!"),
@@ -754,7 +757,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		Convey("Given I have a processor that handle ProcessUpdate function with a context that disables output data push", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					output: testmodel.NewList(),
 				}, nil
@@ -781,7 +784,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 			var _ elemental.Identifiable = testIdentifiable
 			ctx.SetOutputData(testIdentifiable)
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output satisfies the elemental.Identifiable interface
 					output: testIdentifiable,
@@ -807,7 +810,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -818,7 +821,9 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		Convey("Then I should have a 423 error and context should be nil", func() {
 			So(err, ShouldNotBeNil)
-			So(err.(elemental.Error).Code, ShouldEqual, http.StatusLocked)
+			var elemErr elemental.Error
+			So(errors.As(err, &elemErr), ShouldBeTrue)
+			So(elemErr.Code, ShouldEqual, http.StatusLocked)
 		})
 	})
 
@@ -827,7 +832,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -851,7 +856,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -874,7 +879,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Data = []byte(`An invalid JSON`)
 		request.Identity = testmodel.ListIdentity
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -897,7 +902,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Identity = testmodel.TaskIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "status": "not-good"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -920,7 +925,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -941,7 +946,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessUpdate function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -972,7 +977,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessUpdate function and an authorizer that is not authorize", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1014,7 +1019,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Operation = elemental.OperationUpdate
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -1050,7 +1055,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		expectedID := "a"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1096,7 +1101,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		expectedID := "a"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1143,7 +1148,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		expectedID := "a"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1179,7 +1184,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1217,7 +1222,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.List{ID: "a", Secret: "can't see me"},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventCreate, &testmodel.List{})},
@@ -1258,7 +1263,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 		// bug fix: https://github.com/aporeto-inc/bahamut/issues/64
 		Convey("Given I have a processor that handle ProcessDelete function with a context output that does not satisfy elemental.Identifiable", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output will NOT satisfy the elemental.Identifiable interface
 					output: json.RawMessage("some random bytes!"),
@@ -1279,7 +1284,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 
 		Convey("Given I have a processor that handle ProcessDelete function with a context that disables output data push", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					output: testmodel.NewList(),
 				}, nil
@@ -1306,7 +1311,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 			var _ elemental.Identifiable = testIdentifiable
 			ctx.SetOutputData(testIdentifiable)
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output satisfies the elemental.Identifiable interface
 					output: testIdentifiable,
@@ -1330,7 +1335,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -1341,7 +1346,9 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 
 		Convey("Then I should have a 423 error and context should be nil", func() {
 			So(err, ShouldNotBeNil)
-			So(err.(elemental.Error).Code, ShouldEqual, http.StatusLocked)
+			var elemErr elemental.Error
+			So(errors.As(err, &elemErr), ShouldBeTrue)
+			So(elemErr.Code, ShouldEqual, http.StatusLocked)
 		})
 	})
 
@@ -1349,7 +1356,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -1374,7 +1381,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1395,7 +1402,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessDelete function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1426,7 +1433,7 @@ func TestDispatchers_dispatchDeleteOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessDelete function and an authorizer that is not authorize", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1476,7 +1483,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedName := "Fake"
 		expectedSecret := "can't see me"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName, Secret: &expectedSecret},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1518,7 +1525,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		// bug fix: https://github.com/aporeto-inc/bahamut/issues/64
 		Convey("Given I have a processor that handle ProcessPatch function with a context output that does not satisfy elemental.Identifiable", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output will NOT satisfy the elemental.Identifiable interface
 					output: json.RawMessage("some random bytes!"),
@@ -1539,7 +1546,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 
 		Convey("Given I have a processor that handle ProcessPatch function with a context that disables output data push", func() {
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					output: testmodel.NewList(),
 				}, nil
@@ -1566,7 +1573,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 			var _ elemental.Identifiable = testIdentifiable
 			ctx.SetOutputData(testIdentifiable)
 
-			processorFinder := func(identity elemental.Identity) (Processor, error) {
+			processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 				return &mockProcessor{
 					// notice how this output satisfies the elemental.Identifiable interface
 					output: testIdentifiable,
@@ -1591,7 +1598,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`Invalid JSON`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -1614,7 +1621,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -1640,7 +1647,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1662,7 +1669,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1694,7 +1701,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -1736,7 +1743,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -1747,7 +1754,9 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 
 		Convey("Then I should have a 423 error and context should be nil", func() {
 			So(err, ShouldNotBeNil)
-			So(err.(elemental.Error).Code, ShouldEqual, http.StatusLocked)
+			var elemErr elemental.Error
+			So(errors.As(err, &elemErr), ShouldBeTrue)
+			So(elemErr.Code, ShouldEqual, http.StatusLocked)
 		})
 	})
 
@@ -1756,7 +1765,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Operation = elemental.OperationUpdate
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{}, nil
 		}
 
@@ -1793,7 +1802,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedID := "a"
 		expectedName := "Fake"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1836,7 +1845,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedName := "Fake"
 		expectedSecret := "can't see me"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName, Secret: &expectedSecret},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1874,7 +1883,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedID := "a"
 		expectedName := "Fake"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseTask{ID: &expectedID, Name: &expectedName},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.Task{})},
@@ -1914,7 +1923,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedID := "a"
 		expectedName := "Fake"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1953,7 +1962,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedID := "a"
 		expectedName := "Fake"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -1992,7 +2001,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		expectedID := "a"
 		expectedName := "Fake"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				output: &testmodel.SparseList{ID: &expectedID, Name: &expectedName},
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventDelete, &testmodel.List{})},
@@ -2030,7 +2039,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 
 		expectedID := "a"
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: fmt.Errorf("this is an error"),
 			}, nil
@@ -2065,7 +2074,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 		request.Identity = testmodel.ListIdentity
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -2101,7 +2110,7 @@ func TestDispatchers_dispatchInfoOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				events: []*elemental.Event{elemental.NewEvent(elemental.EventUpdate, &testmodel.List{})},
 			}, nil
@@ -2126,7 +2135,7 @@ func TestDispatchers_dispatchInfoOperation(t *testing.T) {
 		request := elemental.NewRequest()
 		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
 				err: elemental.NewError("Error", "Bad request.", "bahamut-test", http.StatusBadRequest),
 			}, nil
@@ -2152,7 +2161,7 @@ func TestDispatchers_dispatchInfoOperation(t *testing.T) {
 		request.Operation = elemental.OperationRetrieveMany
 		request.Identity = elemental.MakeIdentity("Fake", "Test")
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -2174,7 +2183,7 @@ func TestDispatchers_dispatchInfoOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessInfo function and an authenticator that is not authenticated", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 
@@ -2206,7 +2215,7 @@ func TestDispatchers_dispatchInfoOperation(t *testing.T) {
 	Convey("Given I have a processor that does not handle ProcessInfo function and an authorizer that is not authorize", t, func() {
 		request := elemental.NewRequest()
 
-		processorFinder := func(identity elemental.Identity) (Processor, error) {
+		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockEmptyProcessor{}, nil
 		}
 

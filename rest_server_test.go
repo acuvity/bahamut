@@ -33,16 +33,14 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func loadFixtureCertificates() (*x509.CertPool, *x509.CertPool, []tls.Certificate) {
-
-	systemCAPool, _ := x509.SystemCertPool()
+func loadFixtureCertificates() (*x509.CertPool, []tls.Certificate) {
 
 	clientCACertData, _ := os.ReadFile("fixtures/certs/ca-cert.pem")
 	clientCAPool := x509.NewCertPool()
 	clientCAPool.AppendCertsFromPEM(clientCACertData)
 
 	serverCert, _ := tls.LoadX509KeyPair("fixtures/certs/server-cert.pem", "fixtures/certs/server-key.pem")
-	return systemCAPool, clientCAPool, []tls.Certificate{serverCert}
+	return clientCAPool, []tls.Certificate{serverCert}
 }
 
 func TestServer_Initialization(t *testing.T) {
@@ -65,7 +63,7 @@ func TestServer_createSecureHTTPServer(t *testing.T) {
 
 	Convey("Given I create a new api server without all valid tls info", t, func() {
 
-		_, clientcapool, servercerts := loadFixtureCertificates()
+		clientcapool, servercerts := loadFixtureCertificates()
 
 		cfg := config{}
 		cfg.restServer.listenAddress = "address:80"
@@ -248,6 +246,9 @@ func TestServer_Start(t *testing.T) {
 			time.Sleep(30 * time.Millisecond)
 
 			resp, err := http.Get("http://127.0.0.1:" + port1)
+			if err == nil {
+				defer func() { _ = resp.Body.Close() }()
+			}
 
 			Convey("Then the status code should be OK", func() {
 				So(err, ShouldBeNil)
@@ -264,7 +265,7 @@ func TestServer_Start(t *testing.T) {
 
 			// h := func(w http.ResponseWriter, req *http.Request) { w.Write([]byte("hello")) }
 
-			_, clientcapool, servercerts := loadFixtureCertificates()
+			clientcapool, servercerts := loadFixtureCertificates()
 
 			cfg := config{}
 			cfg.restServer.listenAddress = "127.0.0.1:" + port1
@@ -291,6 +292,9 @@ func TestServer_Start(t *testing.T) {
 			client := &http.Client{Transport: transport}
 
 			resp, err := client.Get("https://localhost:" + port1)
+			if err == nil {
+				defer func() { _ = resp.Body.Close() }()
+			}
 
 			Convey("Then the status code should be 200", func() {
 				So(err, ShouldBeNil)

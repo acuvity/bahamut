@@ -11,7 +11,7 @@ import (
 
 const maxCacheSize = 65536
 
-var errTooManyRequest = errors.New("Please retry in a moment")
+var errTooManyRequest = errors.New("please retry in a moment")
 
 type sourceLimiter struct {
 	nextHTTP        http.Handler

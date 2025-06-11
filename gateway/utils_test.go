@@ -324,6 +324,7 @@ func TestMakeGoodByeServer(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
+		defer func() { _ = resp.Body.Close() }()
 
 		So(resp.StatusCode, ShouldEqual, http.StatusServiceUnavailable)
 	})

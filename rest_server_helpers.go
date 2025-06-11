@@ -115,7 +115,7 @@ func extractAPIVersion(path string) (version int, err error) {
 	if components[0] == "v" {
 		version, err = strconv.Atoi(components[1])
 		if err != nil {
-			return 0, fmt.Errorf("Invalid api version number '%s'", components[1])
+			return 0, fmt.Errorf("invalid api version number '%s'", components[1])
 		}
 	}
 

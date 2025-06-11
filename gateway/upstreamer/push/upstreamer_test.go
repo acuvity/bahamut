@@ -424,9 +424,7 @@ func (d deterministicRandom) Intn(int) int {
 	return d.value
 }
 
-func (d deterministicRandom) Shuffle(n int, swap func(i, j int)) {
-	return
-}
+func (d deterministicRandom) Shuffle(n int, swap func(i, j int)) {}
 
 func TestUpstreamUpstreamer(t *testing.T) {
 

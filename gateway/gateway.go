@@ -49,7 +49,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 	rootListener, err := bahamut.MakeListener("tcp4", listenAddr)
 	if err != nil {
-		return nil, fmt.Errorf("unable build fast tcp listener: %s", err)
+		return nil, fmt.Errorf("unable build fast tcp listener: %w", err)
 	}
 
 	if cfg.tcpGlobalRateLimitingEnabled {
@@ -65,7 +65,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 		sc, err := makeProxyProtocolSourceChecker(cfg.proxyProtocolSubnet)
 		if err != nil {
-			return nil, fmt.Errorf("unable build proxy protocol source checker: %s", err)
+			return nil, fmt.Errorf("unable build proxy protocol source checker: %w", err)
 		}
 
 		if cfg.serverTLSConfig != nil {
@@ -185,7 +185,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 		if s.gatewayConfig.responseRewriter != nil {
 			if err := s.gatewayConfig.responseRewriter(resp); err != nil {
-				return fmt.Errorf("unable to execute response rewriter: %s", err)
+				return fmt.Errorf("unable to execute response rewriter: %w", err)
 			}
 		}
 		return nil
@@ -200,7 +200,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		buffer.MemRequestBodyBytes(1024*1024*1024),
 		buffer.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
 	); err != nil {
-		return nil, fmt.Errorf("unable to initialize request buffer: %s", err)
+		return nil, fmt.Errorf("unable to initialize request buffer: %w", err)
 	}
 
 	if cfg.tcpClientMaxConnectionsEnabled {
@@ -214,7 +214,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 			int64(cfg.tcpClientMaxConnections),
 			connlimit.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
 		); err != nil {
-			return nil, fmt.Errorf("unable to initialize connection limiter: %s", err)
+			return nil, fmt.Errorf("unable to initialize connection limiter: %w", err)
 		}
 	}
 
@@ -239,7 +239,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 			cfg.upstreamCircuitBreakerCond,
 			cbreaker.Fallback(&circuitBreakerHandler{}),
 		); err != nil {
-			return nil, fmt.Errorf("unable to initialize circuit breaker: %s", err)
+			return nil, fmt.Errorf("unable to initialize circuit breaker: %w", err)
 		}
 	}
 
@@ -255,7 +255,7 @@ func (s *gateway) Start() {
 	go func() {
 
 		if err := s.server.Serve(s.listener); err != nil {
-			if err == http.ErrServerClosed {
+			if errors.Is(err, http.ErrServerClosed) {
 				return
 			}
 			slog.Error("Unable to start internal API server", err)
@@ -290,7 +290,7 @@ func (s *gateway) Stop() {
 				if strings.Contains(err.Error(), "address already in use") {
 					continue
 				}
-				if err == http.ErrServerClosed {
+				if errors.Is(err, http.ErrServerClosed) {
 					return
 				}
 				slog.Error("Unable to start temporary redirect server", err)

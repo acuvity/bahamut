@@ -84,7 +84,7 @@ func (p *natsPubSub) Publish(publication *Publication, opts ...PubSubOptPublish)
 	publication.ResponseMode = config.desiredResponse
 	data, err := elemental.Encode(elemental.EncodingTypeMSGPACK, publication)
 	if err != nil {
-		return fmt.Errorf("unable to encode publication. message dropped: %s", err)
+		return fmt.Errorf("unable to encode publication. message dropped: %w", err)
 	}
 
 	switch config.desiredResponse {
@@ -221,7 +221,7 @@ func (p *natsPubSub) Connect(ctx context.Context) error {
 
 		select {
 		case <-ctx.Done():
-			return fmt.Errorf("unable to connect to nats on time. last error: %s", err)
+			return fmt.Errorf("unable to connect to nats on time. last error: %w", err)
 		default:
 			time.Sleep(p.retryInterval)
 		}
