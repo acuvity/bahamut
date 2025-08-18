@@ -235,4 +235,13 @@ func Test_Options(t *testing.T) {
 		OptionSourceRateLimitingManager(m)(c)
 		So(c.sourceRateLimitingMetricManager, ShouldEqual, m)
 	})
+
+	Convey("Calling OptionBufferRequestLimits should work", t, func() {
+		c := newGatewayConfig()
+		So(c.bufferMemRequestBodyBytes, ShouldEqual, 1024*1024)
+		So(c.bufferMaxRequestBodyBytes, ShouldEqual, 100*1024*1024)
+		OptionBufferRequestLimits(1, 2)(c)
+		So(c.bufferMemRequestBodyBytes, ShouldEqual, 1)
+		So(c.bufferMaxRequestBodyBytes, ShouldEqual, 2)
+	})
 }

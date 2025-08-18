@@ -107,6 +107,8 @@ type gwconfig struct {
 	corsAllowCredentials               bool
 	blockOpenTracingHeaders            bool
 	trustForwardHeader                 bool
+	bufferMaxRequestBodyBytes          int64
+	bufferMemRequestBodyBytes          int64
 }
 
 func newGatewayConfig() *gwconfig {
@@ -130,6 +132,8 @@ func newGatewayConfig() *gwconfig {
 		httpWriteTimeout:            240 * time.Second,
 		sourceExtractor:             &defaultSourceExtractor{},
 		tcpClientSourceExtractor:    &defaultTCPSourceExtractor{},
+		bufferMemRequestBodyBytes:   1024 * 1024,       // 1MB
+		bufferMaxRequestBodyBytes:   100 * 1024 * 1024, // 100MB
 	}
 }
 
@@ -409,5 +413,16 @@ func OptionTCPGlobalRateLimitingManager(m LimiterMetricManager) Option {
 func OptionSourceRateLimitingManager(m LimiterMetricManager) Option {
 	return func(cfg *gwconfig) {
 		cfg.sourceRateLimitingMetricManager = m
+	}
+}
+
+// OptionBufferRequestLimits sets the gateway buffer limits.
+// mem represents the buffer size, and max represents the
+// maximum data we can process for a single request.
+// Defaults are buffer size of 1MB and max of 100MB
+func OptionBufferRequestLimits(mem int64, max int64) Option {
+	return func(cfg *gwconfig) {
+		cfg.bufferMemRequestBodyBytes = mem
+		cfg.bufferMaxRequestBodyBytes = max
 	}
 }

@@ -196,8 +196,8 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 	if topProxyHTTPHandler, err = buffer.New(
 		topProxyHTTPHandler,
-		// buffer.MaxRequestBodyBytes(1024*1024),
-		// buffer.MemRequestBodyBytes(1024*1024*1024),
+		buffer.MaxRequestBodyBytes(cfg.bufferMaxRequestBodyBytes),
+		buffer.MemRequestBodyBytes(cfg.bufferMemRequestBodyBytes),
 		buffer.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
 	); err != nil {
 		return nil, fmt.Errorf("unable to initialize request buffer: %w", err)
