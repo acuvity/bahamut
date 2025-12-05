@@ -16,6 +16,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"log/slog"
+	"maps"
 	"net/http"
 	"net/url"
 	"sync"
@@ -145,9 +146,7 @@ func (s *wsPushSession) ClaimsMap() map[string]string {
 
 	copiedClaimsMap := map[string]string{}
 
-	for k, v := range s.claimsMap {
-		copiedClaimsMap[k] = v
-	}
+	maps.Copy(copiedClaimsMap, s.claimsMap)
 
 	return copiedClaimsMap
 }
@@ -234,9 +233,7 @@ func (s *wsPushSession) setCurrentPushConfig(f *elemental.PushConfig) {
 	}
 
 	s.parametersLock.Lock()
-	for k, v := range f.Parameters() {
-		s.parameters[k] = v
-	}
+	maps.Copy(s.parameters, f.Parameters())
 	s.parametersLock.Unlock()
 }
 

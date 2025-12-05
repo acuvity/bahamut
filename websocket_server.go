@@ -198,7 +198,7 @@ func (n *pushServer) pushEvents(events ...*elemental.Event) {
 			break
 		}
 
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			err = n.cfg.pushServer.service.Publish(publication)
 			if err != nil {
 				slog.Warn("Unable to publish event",
