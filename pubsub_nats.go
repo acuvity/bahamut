@@ -219,6 +219,11 @@ func (p *natsPubSub) Connect(ctx context.Context) error {
 			return nil
 		}
 
+		var eerr *tls.CertificateVerificationError
+		if errors.As(err, &eerr) {
+			return fmt.Errorf("unable to connect to nats: %w", err)
+		}
+
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("unable to connect to nats on time. last error: %w", err)
