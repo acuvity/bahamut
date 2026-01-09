@@ -199,7 +199,9 @@ func (p *natsPubSub) Subscribe(pubs chan *Publication, errors chan error, topic 
 
 func (p *natsPubSub) Connect(ctx context.Context) error {
 
-	opts := []nats.Option{}
+	opts := []nats.Option{
+		nats.MaxReconnects(-1), // infinite.
+	}
 
 	if p.username != "" || p.password != "" {
 		opts = append(opts, nats.UserInfo(p.username, p.password))
