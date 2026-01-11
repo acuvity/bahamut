@@ -59,6 +59,10 @@ func (m *fakeMetricManager) MeasureRequest(method string, path string) bahamut.F
 	return func(code int, span opentracing.Span) time.Duration { return 0 }
 }
 
+func (m *fakeMetricManager) MeasureGenericRequest(method string, path string) bahamut.FinishMeasurementFunc {
+	return func(code int, span opentracing.Span) time.Duration { return 0 }
+}
+
 func (m *fakeMetricManager) RegisterWSConnection() {
 	atomic.AddInt64(&m.registerWSConnectionCalled, 1)
 }
