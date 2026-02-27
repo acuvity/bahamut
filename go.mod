@@ -3,9 +3,9 @@ module go.acuvity.ai/bahamut
 go 1.24.6
 
 require (
-	go.acuvity.ai/elemental v0.0.0-20260213193513-ee8198ac0113
+	go.acuvity.ai/elemental v0.0.0-20260227164056-44f2e3fd9f3b
 	go.acuvity.ai/regolithe v0.0.0-20260108214434-eb28e7a6e391 // indirect
-	go.acuvity.ai/tg v1.0.1-0.20260224191745-e6f4866bf177
+	go.acuvity.ai/tg v1.0.1-0.20260227164009-15f51a26c9e0
 	go.acuvity.ai/wsc v0.0.0-20250506232542-8de7ff436ec0
 )
 
@@ -38,7 +38,7 @@ require (
 	github.com/antithesishq/antithesis-sdk-go v0.5.0-default-no-op // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
