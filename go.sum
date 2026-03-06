@@ -216,8 +216,8 @@ github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQ
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo0=
 github.com/yusufpapurcu/wmi v1.2.4/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-go.acuvity.ai/elemental v0.0.0-20260305220557-3a7480c75d3a h1:pKVK+Fe++Pl60tBDXZtibzSET6bYnVuDlDhStttBKsE=
-go.acuvity.ai/elemental v0.0.0-20260305220557-3a7480c75d3a/go.mod h1:kCgOIA/LkXUXJmPM4Xp59v5a7kEnRcsdBOVsmKxgwlM=
+go.acuvity.ai/elemental v0.0.0-20260306153138-4fed9f4b42e8 h1:GN2rLPTh30jirxIwPG6amSCEvvirfN/Bp0Kmdb346uU=
+go.acuvity.ai/elemental v0.0.0-20260306153138-4fed9f4b42e8/go.mod h1:kCgOIA/LkXUXJmPM4Xp59v5a7kEnRcsdBOVsmKxgwlM=
 go.acuvity.ai/regolithe v0.0.0-20260108214434-eb28e7a6e391 h1:Tc76jXKsSkogfYB4kqfZnjLj6By5rGE34ZJblIJNPF4=
 go.acuvity.ai/regolithe v0.0.0-20260108214434-eb28e7a6e391/go.mod h1:lXVcvgKQuXHrJjwdv+87+Yf2Khl4GE3CC5voQbYEEiE=
 go.acuvity.ai/tg v1.0.1-0.20260227164009-15f51a26c9e0 h1:deveH/8Eqq7NUSkdfSr63u/Mszutedd3E1rMB2mZipk=
