@@ -15,12 +15,14 @@ import "crypto/x509"
 
 func makeClaims(cert *x509.Certificate) []string {
 
-	claims := []string{
+	claims := make([]string, 0, 4+len(cert.Subject.Organization)+len(cert.Subject.OrganizationalUnit))
+
+	claims = append(claims,
 		"@auth:realm=certificate",
 		"@auth:mode=internal",
-		"@auth:serialnumber=" + cert.SerialNumber.String(),
-		"@auth:commonname=" + cert.Subject.CommonName,
-	}
+		"@auth:serialnumber="+cert.SerialNumber.String(),
+		"@auth:commonname="+cert.Subject.CommonName,
+	)
 
 	for _, o := range cert.Subject.Organization {
 		claims = append(claims, "@auth:organization="+o)

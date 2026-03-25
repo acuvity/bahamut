@@ -104,7 +104,7 @@ func buildVersionedRoutes(modelManagers map[int]elemental.ModelManager, processo
 		}
 
 		for url, rb := range routes {
-			var flatVerbs []string
+			flatVerbs := make([]string, 0, len(rb.verbs))
 
 			for v := range rb.verbs {
 				flatVerbs = append(flatVerbs, v)
