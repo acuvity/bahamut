@@ -138,10 +138,13 @@ func TestMeasureRequest(t *testing.T) {
 
 			Convey("Then the data should collected", func() {
 				So(data[1].GetName(), ShouldEqual, "http_requests_total")
-				So(data[1].GetMetric()[0].Counter.String(), ShouldEqual, "value:1 ")
-				So(data[1].GetMetric()[0].Label[0].String(), ShouldEqual, `name:"code" value:"200" `)
-				So(data[1].GetMetric()[0].Label[1].String(), ShouldEqual, `name:"method" value:"GET" `)
-				So(data[1].GetMetric()[0].Label[2].String(), ShouldEqual, `name:"url" value:"/toto/:id" `)
+				So(data[1].GetMetric()[0].Counter.String(), ShouldStartWith, "value:1 ")
+				So(data[1].GetMetric()[0].Label[0].String(), ShouldContainSubstring, `name:"code"`)
+				So(data[1].GetMetric()[0].Label[0].String(), ShouldContainSubstring, `value:"200"`)
+				So(data[1].GetMetric()[0].Label[1].String(), ShouldContainSubstring, `name:"method"`)
+				So(data[1].GetMetric()[0].Label[1].String(), ShouldContainSubstring, `value:"GET"`)
+				So(data[1].GetMetric()[0].Label[2].String(), ShouldContainSubstring, `name:"url"`)
+				So(data[1].GetMetric()[0].Label[2].String(), ShouldContainSubstring, `value:"/toto/:id"`)
 			})
 		})
 
@@ -154,10 +157,10 @@ func TestMeasureRequest(t *testing.T) {
 
 			Convey("Then the data should collected", func() {
 				So(data[0].GetName(), ShouldEqual, "http_errors_5xx_total")
-				So(data[0].GetMetric()[0].Label[0].String(), ShouldEqual, `name:"code" value:"502" `)
-				So(data[0].GetMetric()[0].Label[1].String(), ShouldEqual, `name:"method" value:"GET" `)
-				So(data[0].GetMetric()[0].Label[2].String(), ShouldEqual, `name:"trace" value:"unknown" `)
-				So(data[0].GetMetric()[0].Label[3].String(), ShouldEqual, `name:"url" value:"/toto/:id" `)
+				So(data[0].GetMetric()[0].Label[0].String(), ShouldEqual, `name:"code" value:"502"`)
+				So(data[0].GetMetric()[0].Label[1].String(), ShouldEqual, `name:"method" value:"GET"`)
+				So(data[0].GetMetric()[0].Label[2].String(), ShouldEqual, `name:"trace" value:"unknown"`)
+				So(data[0].GetMetric()[0].Label[3].String(), ShouldEqual, `name:"url" value:"/toto/:id"`)
 			})
 		})
 	})
@@ -179,9 +182,9 @@ func TestRegisterWSConnection(t *testing.T) {
 
 			Convey("Then the total should increase", func() {
 				So(data[0].GetName(), ShouldEqual, "http_ws_connections_current")
-				So(data[0].GetMetric()[0].String(), ShouldEqual, "gauge:<value:2 > ")
+				So(data[0].GetMetric()[0].String(), ShouldEqual, "gauge:{value:2}")
 				So(data[1].GetName(), ShouldEqual, "http_ws_connections_total")
-				So(data[1].GetMetric()[0].String(), ShouldEqual, "counter:<value:2 > ")
+				So(data[1].GetMetric()[0].String(), ShouldStartWith, "counter:{value:2 ")
 			})
 
 			Convey("When I call UnregisterWSConnection", func() {
@@ -192,9 +195,9 @@ func TestRegisterWSConnection(t *testing.T) {
 
 				Convey("Then the total should increase", func() {
 					So(data[0].GetName(), ShouldEqual, "http_ws_connections_current")
-					So(data[0].GetMetric()[0].String(), ShouldEqual, "gauge:<value:1 > ")
+					So(data[0].GetMetric()[0].String(), ShouldEqual, "gauge:{value:1}")
 					So(data[1].GetName(), ShouldEqual, "http_ws_connections_total")
-					So(data[1].GetMetric()[0].String(), ShouldEqual, "counter:<value:2 > ")
+					So(data[1].GetMetric()[0].String(), ShouldStartWith, "counter:{value:2 ")
 				})
 			})
 		})
@@ -217,9 +220,9 @@ func TestRegisterTCPConnection(t *testing.T) {
 
 			Convey("Then the total should increase", func() {
 				So(data[2].GetName(), ShouldEqual, "tcp_connections_current")
-				So(data[2].GetMetric()[0].String(), ShouldEqual, "gauge:<value:2 > ")
+				So(data[2].GetMetric()[0].String(), ShouldEqual, "gauge:{value:2}")
 				So(data[3].GetName(), ShouldEqual, "tcp_connections_total")
-				So(data[3].GetMetric()[0].String(), ShouldEqual, "counter:<value:2 > ")
+				So(data[3].GetMetric()[0].String(), ShouldStartWith, "counter:{value:2 ")
 			})
 
 			Convey("When I call UnregisterTCPConnection", func() {
@@ -230,9 +233,9 @@ func TestRegisterTCPConnection(t *testing.T) {
 
 				Convey("Then the total should increase", func() {
 					So(data[2].GetName(), ShouldEqual, "tcp_connections_current")
-					So(data[2].GetMetric()[0].String(), ShouldEqual, "gauge:<value:1 > ")
+					So(data[2].GetMetric()[0].String(), ShouldEqual, "gauge:{value:1}")
 					So(data[3].GetName(), ShouldEqual, "tcp_connections_total")
-					So(data[3].GetMetric()[0].String(), ShouldEqual, "counter:<value:2 > ")
+					So(data[3].GetMetric()[0].String(), ShouldStartWith, "counter:{value:2 ")
 				})
 			})
 		})
