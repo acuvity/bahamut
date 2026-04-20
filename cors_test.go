@@ -129,6 +129,48 @@ func TestCORSInject(t *testing.T) {
 		So(h.Get("Access-Control-Allow-Credentials"), ShouldEqual, "true")
 	})
 
+	Convey("Calling inject with matching wildcard additional origin should work", t, func() {
+		a := NewDefaultCORSController("origin", []string{"*.foo.bar"})
+		ac := a.PolicyForRequest(nil)
+
+		h := http.Header{}
+		ac.Inject(h, "a.foo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "a.foo.bar")
+
+		h = http.Header{}
+		ac.Inject(h, "a.b.foo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+
+		h = http.Header{}
+		ac.Inject(h, "https://a.foo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "https://a.foo.bar")
+
+		h = http.Header{}
+		ac.Inject(h, "https://a.foo.bar:8443", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+
+		h = http.Header{}
+		ac.Inject(h, "foo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+
+		h = http.Header{}
+		ac.Inject(h, "notfoo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+	})
+
+	Convey("Calling inject with wildcard additional origin that includes a port should work", t, func() {
+		a := NewDefaultCORSController("origin", []string{"*.foo.bar:8443"})
+		ac := a.PolicyForRequest(nil)
+
+		h := http.Header{}
+		ac.Inject(h, "https://a.foo.bar:8443", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "https://a.foo.bar:8443")
+
+		h = http.Header{}
+		ac.Inject(h, "https://a.foo.bar", false)
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+	})
+
 	Convey("Calling inject with * configured", t, func() {
 		a := NewDefaultCORSController("*", []string{"additional.com"})
 		ac := a.PolicyForRequest(nil)

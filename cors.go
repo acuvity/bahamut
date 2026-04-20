@@ -88,6 +88,28 @@ func (c *corsPolicyController) PolicyForRequest(*http.Request) *CORSPolicy {
 	return c.policy
 }
 
+// matchesAdditional reports whether the given origin matches any entry in
+// additionalOrigins. Entries are either exact strings or single-label
+// wildcards of the form "*.foo.bar" (TLS-style): "*.foo.bar" matches
+// "a.foo.bar" but not "a.b.foo.bar". Lookup is O(1): at most two map lookups.
+func (a *CORSPolicy) matchesAdditional(origin string) bool {
+
+	if origin == "" || len(a.additionalOrigins) == 0 {
+		return false
+	}
+
+	if _, ok := a.additionalOrigins[origin]; ok {
+		return true
+	}
+
+	i := strings.IndexByte(origin, '.')
+	if i < 0 {
+		return false
+	}
+	_, ok := a.additionalOrigins["*"+origin[i:]]
+	return ok
+}
+
 // Inject injects the CORS header on the given http.Header. It will use
 // the given request origin to determine the allow origin policy and the method
 // to determine if it should inject pre-flight OPTIONS header.
@@ -110,7 +132,7 @@ func (a *CORSPolicy) Inject(h http.Header, origin string, preflight bool) {
 	case a.AllowOrigin == CORSOriginMirror && origin == "":
 		corsOrigin = ""
 
-	case func() bool { _, ok := a.additionalOrigins[origin]; return ok }():
+	case a.matchesAdditional(origin):
 		corsOrigin = origin
 	}
 
