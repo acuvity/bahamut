@@ -131,8 +131,19 @@ func newPrometheusMetricsManager(registerer prometheus.Registerer) MetricsManage
 }
 
 func (c *prometheusMetricsManager) MeasureRequest(method string, path string) FinishMeasurementFunc {
+	return c.measureRequest(method, path, true)
+}
 
-	surl := sanitizePath(path)
+func (c *prometheusMetricsManager) MeasureGenericRequest(method string, path string) FinishMeasurementFunc {
+	return c.measureRequest(method, path, false)
+}
+
+func (c *prometheusMetricsManager) measureRequest(method string, path string, sanitize bool) FinishMeasurementFunc {
+
+	surl := path
+	if sanitize {
+		surl = sanitizePath(path)
+	}
 
 	timer := prometheus.NewTimer(
 		prometheus.ObserverFunc(
