@@ -29,6 +29,13 @@ type corsPolicyController struct {
 
 // NewDefaultCORSController returns a CORSPolicyController that always returns a CORSAccessControlPolicy
 // with sensible defaults.
+//
+// additionalOrigins is the set of origins (beyond origin) that are allowed to
+// be mirrored back in Access-Control-Allow-Origin. Entries may be either exact
+// origins (e.g. "https://app.foo.bar") or single-label wildcards of the form
+// "*.foo.bar": "*.foo.bar" matches "a.foo.bar" but not "a.b.foo.bar".
+// Note: this is not glob matching; the wildcard only works as a leading
+// single-label prefix ("*.domain") and is not a general pattern.
 func NewDefaultCORSController(origin string, additionalOrigins []string) CORSPolicyController {
 
 	additionalOriginsMap := make(map[string]struct{}, len(additionalOrigins))
