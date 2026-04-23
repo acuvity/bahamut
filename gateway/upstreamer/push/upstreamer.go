@@ -106,11 +106,7 @@ func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 		return "", nil
 
 	case 1:
-		ep := c.apis[key][0]
-		ep.RLock()
-		defer ep.RUnlock()
-
-		return ep.address, nil
+		n1, n2 = 0, 0
 
 	case 2:
 		n1, n2 = 0, 1
