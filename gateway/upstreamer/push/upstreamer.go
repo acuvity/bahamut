@@ -267,17 +267,8 @@ func (c *Upstreamer) Start(ctx context.Context) (chan struct{}, *sync.WaitGroup)
 
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		c.listenPeers(ctx)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		c.listenServices(ctx, ready)
-	}()
+	wg.Go(func() { c.listenPeers(ctx) })
+	wg.Go(func() { c.listenServices(ctx, ready) })
 
 	return ready, &wg
 }

@@ -41,7 +41,7 @@ func pick(randomizer Randomizer, length int) (int, int) {
 	}
 
 	idxs := make([]int, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		idxs[i] = i
 	}
 
