@@ -121,14 +121,14 @@ func Test_defaultTCPSourceExtractor_ExtractSource(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		f       defaultTCPSourceExtractor
+		f       defaultIPSourceExtractor
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
 			"source",
-			defaultTCPSourceExtractor{},
+			defaultIPSourceExtractor{},
 			args{
 				&http.Request{RemoteAddr: "1.1.1.1"},
 			},
@@ -138,7 +138,7 @@ func Test_defaultTCPSourceExtractor_ExtractSource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := defaultTCPSourceExtractor{}
+			f := defaultIPSourceExtractor{}
 			got, err := f.ExtractSource(tt.args.r)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultTCPSourceExtractor.ExtractSource() error = %v, wantErr %v", err, tt.wantErr)

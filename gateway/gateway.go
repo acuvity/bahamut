@@ -203,15 +203,15 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		return nil, fmt.Errorf("unable to initialize request buffer: %w", err)
 	}
 
-	if cfg.tcpClientMaxConnectionsEnabled {
+	if cfg.clientMaxConnectionsEnabled {
 
 		if topProxyHTTPHandler, err = connlimit.New(
 			topProxyHTTPHandler,
 			utils.ExtractorFunc(func(req *http.Request) (token string, amount int64, err error) {
-				token, err = cfg.tcpClientSourceExtractor.ExtractSource(req)
+				token, err = cfg.sourceExtractor.ExtractSource(req)
 				return token, 1, err
 			}),
-			int64(cfg.tcpClientMaxConnections),
+			int64(cfg.clientMaxConnections),
 			connlimit.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
 		); err != nil {
 			return nil, fmt.Errorf("unable to initialize connection limiter: %w", err)

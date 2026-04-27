@@ -65,7 +65,6 @@ type gwconfig struct {
 	sourceExtractor                    SourceExtractor
 	metricsManager                     bahamut.MetricsManager
 	sourceRateLimitingMetricManager    LimiterMetricManager
-	tcpClientSourceExtractor           SourceExtractor
 	sourceRateExtractor                RateExtractor
 	tcpGlobalRateLimitingMetricManager LimiterMetricManager
 	exactInterceptors                  map[string]InterceptorFunc
@@ -81,7 +80,7 @@ type gwconfig struct {
 	upstreamCircuitBreakerCond         string
 	upstreamURLScheme                  string
 	additionalCorsOrigin               []string
-	tcpClientMaxConnections            int
+	clientMaxConnections               int
 	upstreamIdleConnTimeout            time.Duration
 	sourceRateLimitingRPS              rate.Limit
 	httpIdleTimeout                    time.Duration
@@ -94,7 +93,7 @@ type gwconfig struct {
 	upstreamMaxIdleConns               int
 	upstreamMaxConnsPerHost            int
 	httpWriteTimeout                   time.Duration
-	tcpClientMaxConnectionsEnabled     bool
+	clientMaxConnectionsEnabled        bool
 	upstreamUseHTTP2                   bool
 	trace                              bool
 	maintenance                        bool
@@ -130,8 +129,7 @@ func newGatewayConfig() *gwconfig {
 		httpIdleTimeout:             240 * time.Second,
 		httpReadTimeout:             120 * time.Second,
 		httpWriteTimeout:            240 * time.Second,
-		sourceExtractor:             &defaultSourceExtractor{},
-		tcpClientSourceExtractor:    &defaultTCPSourceExtractor{},
+		sourceExtractor:             &defaultIPSourceExtractor{},
 		bufferMemRequestBodyBytes:   1024 * 1024,       // 1MB
 		bufferMaxRequestBodyBytes:   100 * 1024 * 1024, // 100MB
 	}
@@ -149,8 +147,8 @@ func OptionEnableProxyProtocol(enabled bool, subnet string) Option {
 	}
 }
 
-// OptionTCPGlobalRateLimiting enables and configures the TCP rate limiter to
-// the rate of the total number of TCP connection the gateway handle.
+// OptionTCPGlobalRateLimiting configures the limiter for
+// the maximum and global number of TCP connections rate.
 func OptionTCPGlobalRateLimiting(cps rate.Limit, burst int) Option {
 	return func(cfg *gwconfig) {
 		cfg.tcpGlobalRateLimitingEnabled = true
@@ -159,32 +157,42 @@ func OptionTCPGlobalRateLimiting(cps rate.Limit, burst int) Option {
 	}
 }
 
-// OptionTCPClientMaxConnections sets the maximum number of TCP connections
-// a client can do at the same time. 0 means no limit.
-// If the sourceExtractor is nil, the default one will be used, which uses
-// the request's RemoteAddr as token.
-func OptionTCPClientMaxConnections(maxConnections int) Option {
+// OptionTCPGlobalRateLimitingMetricManager sets the LimiterMetricManager to
+// use to get metrics on the TCP global rate limiter.
+func OptionTCPGlobalRateLimitingMetricManager(m LimiterMetricManager) Option {
 	return func(cfg *gwconfig) {
-		cfg.tcpClientMaxConnectionsEnabled = maxConnections > 0
-		cfg.tcpClientMaxConnections = maxConnections
+		cfg.tcpGlobalRateLimitingMetricManager = m
 	}
 }
 
-// OptionTCPClientMaxConnectionsSourceExtractor sets the source extractor
-// to use to uniquely identify a client TCP connection.
+// OptionSourceExtractor sets the SourceExtractor to use
+// to uniquely identify a client connection.
 // The default one uses the http.Request RemoteAddr property.
 // Passing nil will reset to the default source extractor.
-func OptionTCPClientMaxConnectionsSourceExtractor(sourceExtractor SourceExtractor) Option {
+func OptionSourceExtractor(sourceExtractor SourceExtractor) Option {
 	return func(cfg *gwconfig) {
 		if sourceExtractor == nil {
-			sourceExtractor = &defaultTCPSourceExtractor{}
+			sourceExtractor = &defaultIPSourceExtractor{}
 		}
-		cfg.tcpClientSourceExtractor = sourceExtractor
+		cfg.sourceExtractor = sourceExtractor
 	}
 }
 
-// OptionSourceRateLimiting sets the rate limit for a single source.
-// If OptionSourceRateLimiting option is used, this option has no effect.
+// OptionSourceMaxConnections sets the maximum number of connections
+// a client can do at the same time. 0 means no limit.
+// A client will be identified by the SourceExtractor.
+// that can be set using OptionSourceExtractor.
+// The default SourceExtractor uses the http.Request RemoteAddr property.
+func OptionSourceMaxConnections(maxConnections int) Option {
+	return func(cfg *gwconfig) {
+		cfg.clientMaxConnectionsEnabled = maxConnections > 0
+		cfg.clientMaxConnections = maxConnections
+	}
+}
+
+// OptionSourceRateLimiting sets the rate limit for a single source identitified by
+// the current SourceExtractor.
+// If OptionSourceRateLimitingDynamic option is used, this option has no effect.
 func OptionSourceRateLimiting(rps rate.Limit, burst int) Option {
 	return func(cfg *gwconfig) {
 		cfg.sourceRateLimitingEnabled = true
@@ -194,7 +202,7 @@ func OptionSourceRateLimiting(rps rate.Limit, burst int) Option {
 }
 
 // OptionSourceRateLimitingDynamic sets the RateExtractor to use to dynamically
-// set the rates for a uniquely identified client.
+// set the rates for a uniquely identified client using the current SourceExtractor.
 // If this option is used, OptionSourceRateLimiting has no effect.
 func OptionSourceRateLimitingDynamic(rateExtractor RateExtractor) Option {
 	return func(cfg *gwconfig) {
@@ -203,16 +211,11 @@ func OptionSourceRateLimitingDynamic(rateExtractor RateExtractor) Option {
 	}
 }
 
-// OptionSourceRateLimitingSourceExtractor configures a custom SourceExtractor
-// to decide how to uniquely identify a client.
-// The default one uses a hash of the authorization header.
-// Passing nil will reset to the default source extractor.
-func OptionSourceRateLimitingSourceExtractor(sourceExtractor SourceExtractor) Option {
+// OptionSourceRateLimitingMetricManager sets the LimiterMetricManager to
+// use to get metrics on the source rate limiter.
+func OptionSourceRateLimitingMetricManager(m LimiterMetricManager) Option {
 	return func(cfg *gwconfig) {
-		if sourceExtractor == nil {
-			sourceExtractor = &defaultSourceExtractor{}
-		}
-		cfg.sourceExtractor = sourceExtractor
+		cfg.sourceRateLimitingMetricManager = m
 	}
 }
 
@@ -397,22 +400,6 @@ func OptionCORSAllowCredentials(allow bool) Option {
 func OptionTrustForwardHeader(trust bool) Option {
 	return func(cfg *gwconfig) {
 		cfg.trustForwardHeader = trust
-	}
-}
-
-// OptionTCPGlobalRateLimitingManager sets the LimiterMetricManager to
-// use to get metrics on the TCP global rate limiter.
-func OptionTCPGlobalRateLimitingManager(m LimiterMetricManager) Option {
-	return func(cfg *gwconfig) {
-		cfg.tcpGlobalRateLimitingMetricManager = m
-	}
-}
-
-// OptionSourceRateLimitingManager sets the LimiterMetricManager to
-// use to get metrics on the source rate limiter.
-func OptionSourceRateLimitingManager(m LimiterMetricManager) Option {
-	return func(cfg *gwconfig) {
-		cfg.sourceRateLimitingMetricManager = m
 	}
 }
 

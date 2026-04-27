@@ -137,7 +137,7 @@ func TestGateway(t *testing.T) {
 				OptionEnableProxyProtocol(true, "0.0.0.0/0"),
 				OptionSourceRateLimitingDynamic(&simpleLimiter{}),
 				OptionTCPGlobalRateLimiting(200.0, 200.0),
-				OptionTCPClientMaxConnections(100),
+				OptionSourceMaxConnections(100),
 				OptionUpstreamConfig(0, 0, 0, 0, 0, "NetworkErrorRatio() > 0.5", false),
 				OptionEnableTrace(true),
 				OptionMetricsManager(mm),
@@ -497,7 +497,7 @@ func TestGateway(t *testing.T) {
 				OptionServerTLSConfig(&tls.Config{Certificates: []tls.Certificate{makeServerCert()}}),
 				OptionUpstreamTLSConfig(&tls.Config{InsecureSkipVerify: true}),
 				OptionTCPGlobalRateLimiting(200.0, 200.0),
-				OptionTCPClientMaxConnections(100),
+				OptionSourceMaxConnections(100),
 				OptionEnableProxyProtocol(true, "0.0.0.0/0"),
 			)
 			defer gw.Stop()
@@ -540,7 +540,7 @@ func TestGateway(t *testing.T) {
 				OptionServerTLSConfig(&tls.Config{Certificates: []tls.Certificate{makeServerCert()}}),
 				OptionUpstreamTLSConfig(&tls.Config{InsecureSkipVerify: true}),
 				OptionTCPGlobalRateLimiting(200.0, 200.0),
-				OptionTCPClientMaxConnections(100),
+				OptionSourceMaxConnections(100),
 			)
 			defer gw.Stop()
 
@@ -582,7 +582,7 @@ func TestGateway(t *testing.T) {
 				OptionServerTLSConfig(&tls.Config{Certificates: []tls.Certificate{makeServerCert()}}),
 				OptionUpstreamTLSConfig(&tls.Config{InsecureSkipVerify: true}),
 				OptionTCPGlobalRateLimiting(200.0, 200.0),
-				OptionTCPClientMaxConnections(100),
+				OptionSourceMaxConnections(100),
 				OptionEnableProxyProtocol(true, "oopsy"),
 			)
 

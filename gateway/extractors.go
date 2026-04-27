@@ -47,9 +47,9 @@ func (f defaultSourceExtractor) ExtractSource(r *http.Request) (string, error) {
 	return fmt.Sprintf("%d", xxhash.Sum64([]byte(v))), nil
 }
 
-type defaultTCPSourceExtractor struct{}
+type defaultIPSourceExtractor struct{}
 
-func (f defaultTCPSourceExtractor) ExtractSource(r *http.Request) (string, error) {
+func (f defaultIPSourceExtractor) ExtractSource(r *http.Request) (string, error) {
 
 	return r.RemoteAddr, nil
 }

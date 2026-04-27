@@ -33,22 +33,22 @@ func Test_Options(t *testing.T) {
 
 	Convey("Calling OptionTCPClientMaxConnections should work", t, func() {
 		c := newGatewayConfig()
-		OptionTCPClientMaxConnections(3)(c)
-		So(c.tcpClientMaxConnectionsEnabled, ShouldEqual, true)
-		So(c.tcpClientMaxConnections, ShouldEqual, 3)
+		OptionSourceMaxConnections(3)(c)
+		So(c.clientMaxConnectionsEnabled, ShouldEqual, true)
+		So(c.clientMaxConnections, ShouldEqual, 3)
 
-		OptionTCPClientMaxConnections(0)(c)
-		So(c.tcpClientMaxConnectionsEnabled, ShouldEqual, false)
-		So(c.tcpClientMaxConnections, ShouldEqual, 0)
+		OptionSourceMaxConnections(0)(c)
+		So(c.clientMaxConnectionsEnabled, ShouldEqual, false)
+		So(c.clientMaxConnections, ShouldEqual, 0)
 	})
 
-	Convey("Calling OptionTCPClientMaxConnectionsSourceExtractor should work", t, func() {
+	Convey("Calling OptionSourceExtractor should work", t, func() {
 		c := newGatewayConfig()
-		OptionTCPClientMaxConnectionsSourceExtractor(nil)(c)
-		So(c.tcpClientSourceExtractor, ShouldHaveSameTypeAs, &defaultTCPSourceExtractor{})
-		se := &defaultTCPSourceExtractor{}
-		OptionTCPClientMaxConnectionsSourceExtractor(se)(c)
-		So(c.tcpClientSourceExtractor, ShouldEqual, se)
+		OptionSourceExtractor(nil)(c)
+		So(c.sourceExtractor, ShouldHaveSameTypeAs, &defaultIPSourceExtractor{})
+		se := &defaultIPSourceExtractor{}
+		OptionSourceExtractor(se)(c)
+		So(c.sourceExtractor, ShouldEqual, se)
 	})
 
 	Convey("Calling OptionSourceRateLimiting should work", t, func() {
@@ -64,15 +64,6 @@ func Test_Options(t *testing.T) {
 		re := RateExtractor(nil)
 		OptionSourceRateLimitingDynamic(re)(c)
 		So(c.sourceRateExtractor, ShouldEqual, re)
-	})
-
-	Convey("Calling OptionSourceRateLimitingSourceExtractor should work", t, func() {
-		c := newGatewayConfig()
-		OptionSourceRateLimitingSourceExtractor(nil)(c)
-		So(c.sourceExtractor, ShouldHaveSameTypeAs, &defaultSourceExtractor{})
-		se := &defaultTCPSourceExtractor{}
-		OptionSourceRateLimitingSourceExtractor(se)(c)
-		So(c.sourceExtractor, ShouldEqual, se)
 	})
 
 	Convey("Calling OptionEnableTrace should work", t, func() {
@@ -225,14 +216,14 @@ func Test_Options(t *testing.T) {
 	Convey("Calling OptionTCPGlobalRateLimitingManager should work", t, func() {
 		c := newGatewayConfig()
 		m := &fakeListenerLimiterMetricManager{}
-		OptionTCPGlobalRateLimitingManager(m)(c)
+		OptionTCPGlobalRateLimitingMetricManager(m)(c)
 		So(c.tcpGlobalRateLimitingMetricManager, ShouldEqual, m)
 	})
 
 	Convey("Calling OptionSourceRateLimitingManager should work", t, func() {
 		c := newGatewayConfig()
 		m := &fakeListenerLimiterMetricManager{}
-		OptionSourceRateLimitingManager(m)(c)
+		OptionSourceRateLimitingMetricManager(m)(c)
 		So(c.sourceRateLimitingMetricManager, ShouldEqual, m)
 	})
 
