@@ -6,7 +6,7 @@ require (
 	go.acuvity.ai/elemental v0.0.0-20260519184958-be12aaf1ecd2
 	go.acuvity.ai/regolithe v0.0.0-20260519184542-934ff1a5b7e3 // indirect
 	go.acuvity.ai/tg v1.0.1-0.20260519184745-c99f6bc63fa0
-	go.acuvity.ai/wsc v0.0.0-20250506232542-8de7ff436ec0
+	go.acuvity.ai/wsc v1.0.0
 )
 
 require (
