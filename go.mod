@@ -1,11 +1,11 @@
 module go.acuvity.ai/bahamut
 
-go 1.26.0
+go 1.26.1
 
 require (
 	go.acuvity.ai/elemental v0.0.0-20260601175251-78f998107f34
 	go.acuvity.ai/regolithe v0.0.0-20260601174230-81cdfce253df // indirect
-	go.acuvity.ai/tg v1.0.1-0.20260519184745-c99f6bc63fa0
+	go.acuvity.ai/tg v1.0.1-0.20260617150848-aafef23260af
 	go.acuvity.ai/wsc v1.0.0
 )
 
