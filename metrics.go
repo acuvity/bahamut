@@ -23,10 +23,27 @@ type FinishMeasurementFunc func(code int, span opentracing.Span) time.Duration
 
 // A MetricsManager handles Prometheus Metrics Management
 type MetricsManager interface {
+
+	// MeasureRequest can be used to measure bahamut request. The url will be
+	// sanitized and eventual id will be switched to :id
 	MeasureRequest(method string, path string) FinishMeasurementFunc
+
+	// MeasureGenericRequest measures an http request without further sanitization.
+	// This can be used to measure random url.
+	MeasureGenericRequest(method string, path string) FinishMeasurementFunc
+
+	// RegisterWSConnection will increment the counter of current websocket connections
 	RegisterWSConnection()
+
+	// UnregisterWSConnection deacreases the counter of currently active websocket connections.
 	UnregisterWSConnection()
+
+	// RegisterTCPConnection will increment the counter of current TCP connections
 	RegisterTCPConnection()
+
+	// UnregisterTCPConnection deacreases the counter of currently active TCP connections.
 	UnregisterTCPConnection()
+
+	// Write writes the state of the measurement into the response writer.
 	Write(w http.ResponseWriter, r *http.Request)
 }
