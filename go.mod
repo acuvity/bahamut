@@ -3,7 +3,7 @@ module go.acuvity.ai/bahamut
 go 1.26.1
 
 require (
-	go.acuvity.ai/elemental v0.0.0-20260707165321-3f9f3977e25f
+	go.acuvity.ai/elemental v0.0.0-20260708172111-828e3f761b65
 	go.acuvity.ai/regolithe v0.0.0-20260601174230-81cdfce253df // indirect
 	go.acuvity.ai/tg v1.0.1-0.20260708162706-306a91e4d7dd
 	go.acuvity.ai/wsc v1.0.0
@@ -85,12 +85,12 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/crypto v0.50.0 // indirect
-	golang.org/x/net v0.53.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.3 // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/ini.v1 v1.67.3 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
