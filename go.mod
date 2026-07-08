@@ -5,7 +5,7 @@ go 1.26.1
 require (
 	go.acuvity.ai/elemental v0.0.0-20260707165321-3f9f3977e25f
 	go.acuvity.ai/regolithe v0.0.0-20260601174230-81cdfce253df // indirect
-	go.acuvity.ai/tg v1.0.1-0.20260617150848-aafef23260af
+	go.acuvity.ai/tg v1.0.1-0.20260708162706-306a91e4d7dd
 	go.acuvity.ai/wsc v1.0.0
 )
 
