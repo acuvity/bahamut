@@ -18,7 +18,6 @@ import (
 	"github.com/vulcand/oxy/v2/buffer"
 	"github.com/vulcand/oxy/v2/cbreaker"
 	"github.com/vulcand/oxy/v2/connlimit"
-	"github.com/vulcand/oxy/v2/forward"
 	"github.com/vulcand/oxy/v2/utils"
 	"go.acuvity.ai/bahamut"
 )
@@ -143,10 +142,9 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		topProxyWSHandler   http.Handler
 	)
 
-	s.forwarder = forward.New(true)
+	s.forwarder = &httputil.ReverseProxy{}
 	s.forwarder.BufferPool = newPool(1024 * 1024)
 	s.forwarder.ErrorHandler = (&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}).ServeHTTP
-	s.forwarder.Director = nil
 	s.forwarder.Transport = &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
