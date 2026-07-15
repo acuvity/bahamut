@@ -157,10 +157,15 @@ func TestMeasureRequest(t *testing.T) {
 
 			Convey("Then the data should collected", func() {
 				So(data[0].GetName(), ShouldEqual, "http_errors_5xx_total")
-				So(data[0].GetMetric()[0].Label[0].String(), ShouldEqual, `name:"code" value:"502"`)
-				So(data[0].GetMetric()[0].Label[1].String(), ShouldEqual, `name:"method" value:"GET"`)
-				So(data[0].GetMetric()[0].Label[2].String(), ShouldEqual, `name:"trace" value:"unknown"`)
-				So(data[0].GetMetric()[0].Label[3].String(), ShouldEqual, `name:"url" value:"/toto/:id"`)
+				labels := data[0].GetMetric()[0].Label
+				So(labels[0].GetName(), ShouldEqual, "code")
+				So(labels[0].GetValue(), ShouldEqual, "502")
+				So(labels[1].GetName(), ShouldEqual, "method")
+				So(labels[1].GetValue(), ShouldEqual, "GET")
+				So(labels[2].GetName(), ShouldEqual, "trace")
+				So(labels[2].GetValue(), ShouldEqual, "unknown")
+				So(labels[3].GetName(), ShouldEqual, "url")
+				So(labels[3].GetValue(), ShouldEqual, "/toto/:id")
 			})
 		})
 	})
