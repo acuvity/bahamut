@@ -16,6 +16,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/mitchellh/copystructure"
 	"go.acuvity.ai/elemental"
 )
 
@@ -427,7 +428,13 @@ func dispatchPatchOperation(
 
 		ctx.originalData = identifiable
 
-		patchable, ok := identifiable.(elemental.Patchable)
+		target, err := copystructure.Copy(identifiable)
+		if err != nil {
+			audit(auditer, ctx, err)
+			return err
+		}
+
+		patchable, ok := target.(elemental.Patchable)
 		if !ok {
 			err := elemental.NewError("Bad Request", "Identifiable is not patchable", "bahamut", http.StatusBadRequest)
 			audit(auditer, ctx, err)

@@ -1830,6 +1830,7 @@ func TestDispatchers_dispatchPatchOperation(t *testing.T) {
 			So(auditer.GetCallCount(), ShouldEqual, expectedNbCalls)
 			So(ctx.outputData, ShouldResemble, &testmodel.SparseList{ID: &expectedID, Name: &expectedName})
 			So(ctx.originalData, ShouldEqual, original)
+			So(original.Name, ShouldEqual, "will be patched")
 			So(len(pusher.events), ShouldEqual, 2)
 			So(pusher.events[0].Type, ShouldEqual, elemental.EventDelete)
 			So(pusher.events[1].Type, ShouldEqual, elemental.EventUpdate)
