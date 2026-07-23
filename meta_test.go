@@ -73,13 +73,6 @@ func Test_buildVersionedRoutes(t *testing.T) {
 						},
 					},
 					{
-						URL:      "/tasks",
-						Identity: "tasks",
-						Verbs: []string{
-							"POST",
-						},
-					},
-					{
 						URL:      "/tasks/:id",
 						Identity: "tasks",
 						Verbs: []string{
@@ -137,13 +130,6 @@ func Test_buildVersionedRoutes(t *testing.T) {
 						Identity: "users",
 						Verbs: []string{
 							"GET",
-						},
-					},
-					{
-						URL:      "/tasks",
-						Identity: "tasks",
-						Verbs: []string{
-							"POST",
 						},
 					},
 					{

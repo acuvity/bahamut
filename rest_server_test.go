@@ -158,10 +158,10 @@ func TestServer_RouteInstallation(t *testing.T) {
 			Convey("Then the bone Multiplexer should have correct number of handlers", func() {
 				So(len(c.multiplexer.Routes[http.MethodPost]), ShouldEqual, 5)
 				So(len(c.multiplexer.Routes[http.MethodGet]), ShouldEqual, 10)
-				So(len(c.multiplexer.Routes[http.MethodDelete]), ShouldEqual, 3)
+				So(len(c.multiplexer.Routes[http.MethodDelete]), ShouldEqual, 5)
 				So(len(c.multiplexer.Routes[http.MethodPatch]), ShouldEqual, 3)
 				So(len(c.multiplexer.Routes[http.MethodHead]), ShouldEqual, 5)
-				So(len(c.multiplexer.Routes[http.MethodPut]), ShouldEqual, 3)
+				So(len(c.multiplexer.Routes[http.MethodPut]), ShouldEqual, 5)
 			})
 		})
 	})
@@ -209,10 +209,10 @@ func TestServer_RouteInstallation(t *testing.T) {
 			Convey("Then the bone Multiplexer should have correct number of handlers", func() {
 				So(len(c.multiplexer.Routes[http.MethodPost]), ShouldEqual, 6)
 				So(len(c.multiplexer.Routes[http.MethodGet]), ShouldEqual, 11)
-				So(len(c.multiplexer.Routes[http.MethodDelete]), ShouldEqual, 4)
+				So(len(c.multiplexer.Routes[http.MethodDelete]), ShouldEqual, 6)
 				So(len(c.multiplexer.Routes[http.MethodPatch]), ShouldEqual, 4)
 				So(len(c.multiplexer.Routes[http.MethodHead]), ShouldEqual, 6)
-				So(len(c.multiplexer.Routes[http.MethodPut]), ShouldEqual, 4)
+				So(len(c.multiplexer.Routes[http.MethodPut]), ShouldEqual, 6)
 			})
 
 			Convey("The routes must have the correct prefix", func() {
