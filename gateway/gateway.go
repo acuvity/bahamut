@@ -175,7 +175,6 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
-			DualStack: true,
 		}).DialContext,
 		ForceAttemptHTTP2:   cfg.upstreamUseHTTP2,
 		TLSClientConfig:     cfg.upstreamTLSConfig,
