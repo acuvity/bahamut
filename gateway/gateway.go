@@ -144,7 +144,8 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 
 	s.forwarder = &httputil.ReverseProxy{}
 	s.forwarder.BufferPool = newPool(1024 * 1024)
-	s.forwarder.ErrorHandler = (&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}).ServeHTTP
+	errHandler := &errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}
+	s.forwarder.ErrorHandler = errHandler.ServeHTTP
 	s.forwarder.Transport = &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -196,7 +197,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		topProxyHTTPHandler,
 		buffer.MaxRequestBodyBytes(cfg.bufferMaxRequestBodyBytes),
 		buffer.MemRequestBodyBytes(cfg.bufferMemRequestBodyBytes),
-		buffer.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
+		buffer.ErrorHandler(errHandler),
 	); err != nil {
 		return nil, fmt.Errorf("unable to initialize request buffer: %w", err)
 	}
@@ -210,7 +211,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 				return token, 1, err
 			}),
 			int64(cfg.clientMaxConnections),
-			connlimit.ErrorHandler(&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc}),
+			connlimit.ErrorHandler(errHandler),
 		); err != nil {
 			return nil, fmt.Errorf("unable to initialize connection limiter: %w", err)
 		}
@@ -224,7 +225,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 			cfg.sourceRateLimitingBurst,
 			cfg.sourceExtractor,
 			cfg.sourceRateExtractor,
-			&errorHandler{corsOriginInjector: s.corsOriginInjectorFunc},
+			errHandler,
 			cfg.sourceRateLimitingMetricManager,
 		)
 		topProxyHTTPHandler = srcLimiter
