@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -556,5 +557,37 @@ HANDLE_INTERCEPTION:
 				s.upstreamerLatency.CollectLatency(upstream, rt)
 			}
 		}
+	}
+}
+
+var versionRegexp = regexp.MustCompile(`/v/\d+`)
+
+// TargetIdentity resolves the identity a path is routed by, and the
+// service prefix it was addressed through: an optional /_service, an
+// optional /v/N version, then the resource.
+func TargetIdentity(path string) (string, string) {
+
+	parts := strings.Split(
+		strings.TrimPrefix(
+			versionRegexp.ReplaceAllString(path, ""),
+			"/",
+		),
+		"/",
+	)
+
+	prefix := ""
+	if len(parts) > 1 && parts[0][0] == '_' {
+		prefix = parts[0][1:]
+		parts = append([]string{}, parts[1:]...)
+	}
+
+	switch len(parts) {
+
+	case 1:
+		return parts[0], prefix
+	case 2:
+		return parts[0], prefix
+	default:
+		return parts[2], prefix
 	}
 }

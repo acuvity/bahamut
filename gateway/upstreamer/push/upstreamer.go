@@ -86,7 +86,7 @@ func (c *Upstreamer) ExtractRates(r *http.Request) (rate.Limit, int, error) {
 // Upstream returns the upstream to go for the given path
 func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 
-	identity, prefix := getTargetIdentity(req.URL.Path)
+	identity, prefix := gateway.TargetIdentity(req.URL.Path)
 	key := fmt.Sprintf("%s/%s", prefix, identity)
 
 	// we rewrite the request to trim the prefix out.

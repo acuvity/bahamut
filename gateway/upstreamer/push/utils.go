@@ -1,38 +1,6 @@
 package push
 
-import (
-	"regexp"
-	"strings"
-)
-
-var vregexp = regexp.MustCompile(`/v/\d+`)
-
-func getTargetIdentity(path string) (string, string) {
-
-	parts := strings.Split(
-		strings.TrimPrefix(
-			vregexp.ReplaceAllString(path, ""),
-			"/",
-		),
-		"/",
-	)
-
-	prefix := ""
-	if len(parts) > 1 && parts[0][0] == '_' {
-		prefix = parts[0][1:]
-		parts = append([]string{}, parts[1:]...)
-	}
-
-	switch len(parts) {
-
-	case 1:
-		return parts[0], prefix
-	case 2:
-		return parts[0], prefix
-	default:
-		return parts[2], prefix
-	}
-}
+import "strings"
 
 func pick(randomizer Randomizer, length int) (int, int) {
 
