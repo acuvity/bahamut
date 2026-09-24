@@ -63,6 +63,9 @@ const (
 
 type gwconfig struct {
 	sourceExtractor                    SourceExtractor
+	streamingIdentities                map[string]struct{}
+	identityBufferLimits               map[string]bufferLimits
+	bufferRequestLimitsSet             bool
 	metricsManager                     bahamut.MetricsManager
 	sourceRateLimitingMetricManager    LimiterMetricManager
 	sourceRateExtractor                RateExtractor
@@ -406,10 +409,48 @@ func OptionTrustForwardHeader(trust bool) Option {
 // OptionBufferRequestLimits sets the gateway buffer limits.
 // mem represents the buffer size, and max represents the
 // maximum data we can process for a single request.
-// Defaults are buffer size of 1MB and max of 100MB
+// Either one set to zero takes the gateway limits,
+// which default to a buffer size of 1MB and a max of 100MB
 func OptionBufferRequestLimits(mem int64, max int64) Option {
 	return func(cfg *gwconfig) {
 		cfg.bufferMemRequestBodyBytes = mem
 		cfg.bufferMaxRequestBodyBytes = max
+		cfg.bufferRequestLimitsSet = true
+	}
+}
+
+type bufferLimits struct{ mem, max int64 }
+
+// OptionIdentityBufferRequestLimits sets the gateway buffer limits for
+// one identity.
+// mem represents the buffer size, and max represents the
+// maximum data we can process for a single request on that identity.
+// Either one set to zero takes the gateway limit, which defaults to a
+// buffer size of 1MB and a max of 100MB.
+//
+// Note: Cannot be used in conjunction with OptionIdentityStreaming
+// for the same identity.
+func OptionIdentityBufferRequestLimits(identity string, mem int64, max int64) Option {
+	return func(cfg *gwconfig) {
+		if cfg.identityBufferLimits == nil {
+			cfg.identityBufferLimits = map[string]bufferLimits{}
+		}
+		cfg.identityBufferLimits[identity] = bufferLimits{mem: mem, max: max}
+	}
+}
+
+// OptionIdentityStreaming declares that one identity reaches its upstream
+// unbuffered, for a resource whose payload is a stream rather than a
+// value. Its size is then bounded by the upstream alone.
+//
+// Note: Cannot be used in conjunction with OptionIdentityBufferRequestLimits
+// for the same identity. Warns if OptionBufferRequestLimits is set, since
+// those limits will not reach this identity.
+func OptionIdentityStreaming(identity string) Option {
+	return func(cfg *gwconfig) {
+		if cfg.streamingIdentities == nil {
+			cfg.streamingIdentities = map[string]struct{}{}
+		}
+		cfg.streamingIdentities[identity] = struct{}{}
 	}
 }

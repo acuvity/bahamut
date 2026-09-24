@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"maps"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -43,6 +45,28 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 	cfg := newGatewayConfig()
 	for _, o := range options {
 		o(cfg)
+	}
+
+	var contradictory []string
+	for identity := range cfg.identityBufferLimits {
+		if _, ok := cfg.streamingIdentities[identity]; ok {
+			contradictory = append(contradictory, identity)
+		}
+	}
+
+	if len(contradictory) > 0 {
+		slices.Sort(contradictory)
+		return nil, fmt.Errorf(
+			"incompatible options: identities declared streaming (OptionIdentityStreaming) and buffer limits (OptionIdentityBufferRequestLimits): %s: a streaming body is never buffered",
+			strings.Join(contradictory, ", "),
+		)
+	}
+
+	if cfg.bufferRequestLimitsSet && len(cfg.streamingIdentities) > 0 {
+		slog.Warn(
+			"Buffer request limits do not apply to streaming identities",
+			"identities", strings.Join(slices.Sorted(maps.Keys(cfg.streamingIdentities)), ", "),
+		)
 	}
 
 	var listener net.Listener
@@ -191,16 +215,69 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		return nil
 	}
 
-	topProxyHTTPHandler = s.forwarder
 	topProxyWSHandler = s.forwarder
 
-	if topProxyHTTPHandler, err = buffer.New(
-		topProxyHTTPHandler,
+	bufferedHandler, err := buffer.New(
+		s.forwarder,
 		buffer.MaxRequestBodyBytes(cfg.bufferMaxRequestBodyBytes),
 		buffer.MemRequestBodyBytes(cfg.bufferMemRequestBodyBytes),
 		buffer.ErrorHandler(errHandler),
-	); err != nil {
+	)
+	if err != nil {
 		return nil, fmt.Errorf("unable to initialize request buffer: %w", err)
+	}
+
+	// One handler per identity wanting something other than the default,
+	// resolved here so a request costs a single lookup. Streaming goes to
+	// the forwarder untouched; a limit of its own gets its own buffer,
+	// since a buffer carries its limits.
+	perIdentity := make(map[string]http.Handler, len(cfg.streamingIdentities)+len(cfg.identityBufferLimits))
+
+	for identity := range cfg.streamingIdentities {
+		perIdentity[identity] = s.forwarder
+	}
+
+	for identity, limits := range cfg.identityBufferLimits {
+
+		memLimit := limits.mem
+		if memLimit <= 0 {
+			memLimit = cfg.bufferMemRequestBodyBytes
+		}
+
+		maxLimit := limits.max
+		if maxLimit <= 0 {
+			maxLimit = cfg.bufferMaxRequestBodyBytes
+		}
+
+		h, err := buffer.New(
+			s.forwarder,
+			buffer.MaxRequestBodyBytes(maxLimit),
+			buffer.MemRequestBodyBytes(memLimit),
+			buffer.ErrorHandler(errHandler),
+		)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to initialize request buffer for identity %q: %w",
+				identity,
+				err,
+			)
+		}
+
+		perIdentity[identity] = h
+	}
+
+	topProxyHTTPHandler = bufferedHandler
+
+	if len(perIdentity) > 0 {
+		topProxyHTTPHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			h := perIdentity[identityOf(r.URL.Path)]
+			if h == nil {
+				h = bufferedHandler
+			}
+
+			h.ServeHTTP(w, r)
+		})
 	}
 
 	if cfg.clientMaxConnectionsEnabled {
@@ -591,3 +668,5 @@ func TargetIdentity(path string) (string, string) {
 		return parts[2], prefix
 	}
 }
+
+func identityOf(path string) string { identity, _ := TargetIdentity(path); return identity }
