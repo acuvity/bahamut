@@ -114,7 +114,11 @@ func TestNonNotifier(t *testing.T) {
 							checked++
 						}
 					}
-					So(checked, ShouldEqual, 5)
+					// 4 unique URLs total across the test model:
+					//   /lists, /lists/:id, /lists/:id/tasks, /tasks/:id
+					// Was 5 before the buildVersionedRoutes fix that no longer
+					// emits a phantom POST /tasks for parent-only Create.
+					So(checked, ShouldEqual, 4)
 
 					Convey("Then I wait 1.5sec and I should get another pusb", func() {
 

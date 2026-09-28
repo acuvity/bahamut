@@ -68,20 +68,8 @@ func buildVersionedRoutes(modelManagers map[int]elemental.ModelManager, processo
 				continue
 			}
 
-			if len(relationship.Create) > 0 {
-				addRoute(routes, identity, fmt.Sprintf("/%s", identity.Category), "POST", identity.Private)
-			}
-
 			if len(relationship.Retrieve) > 0 {
 				addRoute(routes, identity, fmt.Sprintf("/%s/:id", identity.Category), "GET", identity.Private)
-			}
-
-			if len(relationship.Delete) > 0 {
-				addRoute(routes, identity, fmt.Sprintf("/%s/:id", identity.Category), "DELETE", identity.Private)
-			}
-
-			if len(relationship.Update) > 0 {
-				addRoute(routes, identity, fmt.Sprintf("/%s/:id", identity.Category), "PUT", identity.Private)
 			}
 
 			for parent := range relationship.RetrieveMany {
@@ -99,6 +87,24 @@ func buildVersionedRoutes(modelManagers map[int]elemental.ModelManager, processo
 					addRoute(routes, identity, fmt.Sprintf("/%s", identity.Category), "POST", identity.Private)
 				} else {
 					addRoute(routes, identity, fmt.Sprintf("/%s/:id/%s", modelManager.IdentityFromName(parent).Category, identity.Category), "POST", identity.Private)
+				}
+			}
+
+			for parent := range relationship.Delete {
+
+				if parent == "root" {
+					addRoute(routes, identity, fmt.Sprintf("/%s/:id", identity.Category), "DELETE", identity.Private)
+				} else {
+					addRoute(routes, identity, fmt.Sprintf("/%s/:id/%s", modelManager.IdentityFromName(parent).Category, identity.Category), "DELETE", identity.Private)
+				}
+			}
+
+			for parent := range relationship.Update {
+
+				if parent == "root" {
+					addRoute(routes, identity, fmt.Sprintf("/%s/:id", identity.Category), "PUT", identity.Private)
+				} else {
+					addRoute(routes, identity, fmt.Sprintf("/%s/:id/%s", modelManager.IdentityFromName(parent).Category, identity.Category), "PUT", identity.Private)
 				}
 			}
 		}

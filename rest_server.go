@@ -182,6 +182,8 @@ func (a *restServer) installRoutes(routesInfo map[int][]RouteInfo) {
 	a.multiplexer.Get(path.Join(a.cfg.restServer.apiPrefix, "/:parentcategory/:id/:category"), a.makeHandler(handleRetrieveMany))
 	a.multiplexer.Post(path.Join(a.cfg.restServer.apiPrefix, "/:category"), a.makeHandler(handleCreate))
 	a.multiplexer.Post(path.Join(a.cfg.restServer.apiPrefix, "/:parentcategory/:id/:category"), a.makeHandler(handleCreate))
+	a.multiplexer.Put(path.Join(a.cfg.restServer.apiPrefix, "/:parentcategory/:id/:category"), a.makeHandler(handleUpdate))
+	a.multiplexer.Delete(path.Join(a.cfg.restServer.apiPrefix, "/:parentcategory/:id/:category"), a.makeHandler(handleDelete))
 	a.multiplexer.Head(path.Join(a.cfg.restServer.apiPrefix, "/:category"), a.makeHandler(handleInfo))
 	a.multiplexer.Head(path.Join(a.cfg.restServer.apiPrefix, "/:parentcategory/:id/:category"), a.makeHandler(handleInfo))
 
@@ -194,6 +196,8 @@ func (a *restServer) installRoutes(routesInfo map[int][]RouteInfo) {
 	a.multiplexer.Get(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:parentcategory/:id/:category"), a.makeHandler(handleRetrieveMany))
 	a.multiplexer.Post(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:category"), a.makeHandler(handleCreate))
 	a.multiplexer.Post(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:parentcategory/:id/:category"), a.makeHandler(handleCreate))
+	a.multiplexer.Put(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:parentcategory/:id/:category"), a.makeHandler(handleUpdate))
+	a.multiplexer.Delete(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:parentcategory/:id/:category"), a.makeHandler(handleDelete))
 	a.multiplexer.Head(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:category"), a.makeHandler(handleInfo))
 	a.multiplexer.Head(path.Join(a.cfg.restServer.apiPrefix, "/v/:version/:parentcategory/:id/:category"), a.makeHandler(handleInfo))
 
