@@ -381,6 +381,27 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 				break
 			}
 
+			// Notifiers that predate the region field do not
+			// send one. Assume the default region for those.
+			if sp.Region == "" {
+				sp.Region = defaultRegion
+			}
+
+			// We never route across regions. When a list of
+			// regions is configured, services from regions we
+			// do not care about are not registered at all.
+			// An empty list accepts all regions.
+			if len(c.config.regions) > 0 {
+				if _, ok := c.config.regions[sp.Region]; !ok {
+					slog.Debug("Ignoring service ping from foreign region",
+						"key", sp.Key(),
+						"region", sp.Region,
+						"allowed regions", c.config.regions,
+					)
+					break
+				}
+			}
+
 			if c.config.overrideEndpointAddress != "" {
 				_, p, err := net.SplitHostPort(sp.Endpoint)
 				if err == nil {
@@ -397,6 +418,7 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 					c.lock.Unlock()
 					slog.Debug("Handled service hello",
 						"key", sp.Key(),
+						"region", sp.Region,
 						"backend", sp.Endpoint,
 					)
 				}
@@ -421,9 +443,9 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 					c.apis = resyncRoutes(services, c.config.exposePrivateAPIs, c.config.eventsAPIs)
 					c.lock.Unlock()
 					c.latencies.Delete(sp.Endpoint)
-					slog.Debug(
-						"Handled service goodbye",
+					slog.Debug("Handled service goodbye",
 						"key", sp.Key(),
+						"region", sp.Region,
 						"backend", sp.Endpoint,
 					)
 				}
