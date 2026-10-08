@@ -17,6 +17,7 @@ type upstreamConfig struct {
 	globalServiceTopic          string
 	requiredServices            []string
 	regions                     map[string]struct{}
+	regionExtractor             RegionExtractor
 	serviceTimeoutCheckInterval time.Duration
 	serviceTimeout              time.Duration
 	peerTimeout                 time.Duration
@@ -41,6 +42,7 @@ func newUpstreamConfig() upstreamConfig {
 		tokenLimitingBurst:          2000,
 		tokenLimitingRPS:            500,
 		regions:                     map[string]struct{}{},
+		regionExtractor:             defaultRegionExtractor,
 	}
 }
 
@@ -160,5 +162,14 @@ func OptionUpstreamerRegionFilter(regions ...string) UpstreamerOption {
 		for _, r := range regions {
 			cfg.regions[r] = struct{}{}
 		}
+	}
+}
+
+// OptionUpstreamerRegionExtractor sets the function used to extract the
+// desired region from incoming requests. By default, the X-Region header
+// is read, falling back to "main".
+func OptionUpstreamerRegionExtractor(extractor RegionExtractor) UpstreamerOption {
+	return func(cfg *upstreamConfig) {
+		cfg.regionExtractor = extractor
 	}
 }
