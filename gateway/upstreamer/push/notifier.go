@@ -21,6 +21,7 @@ type Notifier struct {
 	endpoint           string
 	serviceStatusTopic string
 	prefix             string
+	region             string
 	frequency          time.Duration
 }
 
@@ -46,6 +47,7 @@ func NewNotifier(
 		limiters:           cfg.rateLimits,
 		frequency:          cfg.pingInterval,
 		prefix:             cfg.prefix,
+		region:             cfg.region,
 		privateOverrides:   cfg.privateOverrides,
 		hiddenAPIs:         cfg.hiddenAPIs,
 	}
@@ -83,6 +85,7 @@ func (w *Notifier) MakeStartHook(ctx context.Context) func(server bahamut.Server
 		sp := servicePing{
 			Name:         w.serviceName,
 			Prefix:       w.prefix,
+			Region:       w.region,
 			Status:       entityStatusHello,
 			Endpoint:     w.endpoint,
 			Routes:       routes,
@@ -149,6 +152,7 @@ func (w *Notifier) MakeStopHook() func(server bahamut.Server) error {
 		if err := pub.Encode(servicePing{
 			Name:     w.serviceName,
 			Prefix:   w.prefix,
+			Region:   w.region,
 			Status:   entityStatusGoodbye,
 			Endpoint: w.endpoint,
 		}); err != nil {
