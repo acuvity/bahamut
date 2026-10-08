@@ -12,6 +12,7 @@ type notifierConfig struct {
 	privateOverrides map[string]bool
 	hiddenAPIs       map[string]bool
 	prefix           string
+	region           string
 	pingInterval     time.Duration
 }
 
@@ -21,6 +22,7 @@ func newNotifierConfig() notifierConfig {
 		pingInterval:     5 * time.Second,
 		privateOverrides: map[string]bool{},
 		hiddenAPIs:       map[string]bool{},
+		region:           defaultRegion,
 	}
 }
 
@@ -53,6 +55,14 @@ func OptionNotifierAnnounceRateLimits(rls IdentityToAPILimitersRegistry) Notifie
 func OptionNotifierPrefix(prefix string) NotifierOption {
 	return func(c *notifierConfig) {
 		c.prefix = prefix
+	}
+}
+
+// OptionNotifierAnnounceRegion sets the region that the notifier
+// announces in its pings. The default is "main".
+func OptionNotifierAnnounceRegion(region string) NotifierOption {
+	return func(c *notifierConfig) {
+		c.region = region
 	}
 }
 
