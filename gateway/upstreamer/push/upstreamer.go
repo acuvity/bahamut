@@ -35,7 +35,7 @@ type Upstreamer struct {
 	lastPeerChangeDate atomic.Value
 	lastRateSet        atomic.Value
 	pubsub             bahamut.PubSubClient
-	apis               map[string][]*endpointInfo
+	apis               map[string]map[string][]*endpointInfo
 	serviceStatusTopic string
 	peerStatusTopic    string
 	config             upstreamConfig
@@ -57,7 +57,7 @@ func NewUpstreamer(
 
 	return &Upstreamer{
 		pubsub:             pubsub,
-		apis:               map[string][]*endpointInfo{},
+		apis:               map[string]map[string][]*endpointInfo{},
 		serviceStatusTopic: serviceStatusTopic,
 		peerStatusTopic:    peerStatusTopic,
 		config:             cfg,
@@ -84,7 +84,7 @@ func (c *Upstreamer) ExtractRates(r *http.Request) (rate.Limit, int, error) {
 }
 
 // Upstream returns the upstream to go for the given path
-func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
+func (c *Upstreamer) Upstream(req *http.Request) (gateway.Upstream, error) {
 
 	identity, prefix := gateway.TargetIdentity(req.URL.Path)
 	key := fmt.Sprintf("%s/%s", prefix, identity)
@@ -93,17 +93,23 @@ func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 	req.URL.Path = strings.TrimPrefix(req.URL.Path, "/_"+prefix)
 	req.RequestURI = req.URL.String()
 
+	// We extract the region the request wants to be served from.
+	// Only the endpoints of that region are candidates.
+	region := c.config.regionExtractor(req)
+
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	l := len(c.apis[key])
+	endpoints := c.apis[key][region]
+
+	l := len(endpoints)
 
 	var n1, n2 int
 
 	switch l {
 
 	case 0:
-		return "", nil
+		return gateway.Upstream{}, nil
 
 	case 1:
 		n1, n2 = 0, 0
@@ -115,8 +121,8 @@ func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 		n1, n2 = pick(c.config.randomizer, l)
 	}
 
-	epi1 := c.apis[key][n1]
-	epi2 := c.apis[key][n2]
+	epi1 := endpoints[n1]
+	epi2 := endpoints[n2]
 
 	addresses := [2]string{}
 	loads := [2]float64{}
@@ -232,7 +238,7 @@ func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 	// it's address.
 	addr, ok := check(idx)
 	if ok {
-		return addr, nil
+		return gateway.Upstream{Address: addr, Region: region}, nil
 	}
 
 	// If not, we flip the index.
@@ -249,11 +255,11 @@ func (c *Upstreamer) Upstream(req *http.Request) (string, error) {
 	// of the load between the 2 candidates.
 	addr, ok = check(idx)
 	if ok {
-		return addr, nil
+		return gateway.Upstream{Address: addr, Region: region}, nil
 	}
 
 	// If it is sill not ok, we return a 429 error.
-	return "", gateway.ErrUpstreamerTooManyRequests
+	return gateway.Upstream{}, gateway.ErrUpstreamerTooManyRequests
 }
 
 // Start starts for new backend services.
