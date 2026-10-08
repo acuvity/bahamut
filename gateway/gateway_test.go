@@ -49,10 +49,10 @@ func (u *simpleUpstreamer) CollectLatency(address string, rt time.Duration) {
 }
 
 type fakeMetricManager struct {
-	registerWSConnectionCalled    int64
-	unregisterWSConnectionCalled  int64
-	registerTCPConnectionCalled   int64
-	unregisterTCPConnectionCalled int64
+	registerWSConnectionCalled    atomic.Int64
+	unregisterWSConnectionCalled  atomic.Int64
+	registerTCPConnectionCalled   atomic.Int64
+	unregisterTCPConnectionCalled atomic.Int64
 }
 
 func (m *fakeMetricManager) MeasureRequest(method string, path string) bahamut.FinishMeasurementFunc {
@@ -60,16 +60,16 @@ func (m *fakeMetricManager) MeasureRequest(method string, path string) bahamut.F
 }
 
 func (m *fakeMetricManager) RegisterWSConnection() {
-	atomic.AddInt64(&m.registerWSConnectionCalled, 1)
+	m.registerWSConnectionCalled.Add(1)
 }
 func (m *fakeMetricManager) UnregisterWSConnection() {
-	atomic.AddInt64(&m.unregisterWSConnectionCalled, 1)
+	m.unregisterWSConnectionCalled.Add(1)
 }
 func (m *fakeMetricManager) RegisterTCPConnection() {
-	atomic.AddInt64(&m.registerTCPConnectionCalled, 1)
+	m.registerTCPConnectionCalled.Add(1)
 }
 func (m *fakeMetricManager) UnregisterTCPConnection() {
-	atomic.AddInt64(&m.unregisterTCPConnectionCalled, 1)
+	m.unregisterTCPConnectionCalled.Add(1)
 }
 func (m *fakeMetricManager) Write(w http.ResponseWriter, r *http.Request) {}
 
