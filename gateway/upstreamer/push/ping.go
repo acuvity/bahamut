@@ -12,11 +12,6 @@ const (
 	entityStatusHello   entityStatus = 1
 )
 
-// defaultRegion is the region announced by notifiers that do not
-// set one explicitly, and the region assumed for pings received
-// from notifiers that do not send a region at all.
-const defaultRegion = "main"
-
 // An APILimiter holds the parameters of a *rate.Limiter.
 // It is used to announce a desired rate limit for
 // inconming requests.
