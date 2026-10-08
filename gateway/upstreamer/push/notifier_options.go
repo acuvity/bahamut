@@ -1,6 +1,7 @@
 package push
 
 import (
+	"maps"
 	"time"
 
 	"go.acuvity.ai/elemental"
@@ -43,9 +44,7 @@ func OptionNotifierPingInterval(interval time.Duration) NotifierOption {
 func OptionNotifierAnnounceRateLimits(rls IdentityToAPILimitersRegistry) NotifierOption {
 	return func(c *notifierConfig) {
 		c.rateLimits = make(IdentityToAPILimitersRegistry, len(rls))
-		for k, v := range rls {
-			c.rateLimits[k] = v
-		}
+		maps.Copy(c.rateLimits, rls)
 	}
 }
 
