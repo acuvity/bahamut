@@ -26,20 +26,20 @@ type simpleUpstreamer struct {
 	nextErr error
 }
 
-func (u *simpleUpstreamer) Upstream(req *http.Request) (upstream string, err error) {
+func (u *simpleUpstreamer) Upstream(req *http.Request) (upstream Upstream, err error) {
 
 	if u.nextErr != nil {
 		e := u.nextErr
 		u.nextErr = nil
-		return "", e
+		return Upstream{}, e
 	}
 	switch req.URL.Path {
 	case "/ups1":
-		return strings.Replace(u.ups1.URL, "https://", "", 1), nil
+		return Upstream{Address: strings.Replace(u.ups1.URL, "https://", "", 1)}, nil
 	case "/ups2":
-		return strings.Replace(u.ups2.URL, "https://", "", 1), nil
+		return Upstream{Address: strings.Replace(u.ups2.URL, "https://", "", 1)}, nil
 	default:
-		return "", nil
+		return Upstream{}, nil
 	}
 }
 

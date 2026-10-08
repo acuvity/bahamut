@@ -363,7 +363,7 @@ func Test_resyncRoutes(t *testing.T) {
 		includePrivate bool
 	}
 	tests := []struct {
-		want map[string][]*endpointInfo
+		want map[string]map[string][]*endpointInfo
 		args args
 		name string
 	}{
@@ -395,11 +395,13 @@ func Test_resyncRoutes(t *testing.T) {
 						endpoints: map[string]*endpointInfo{
 							"1.1.1.1:1": {
 								address:  "1.1.1.1:1",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
 							"1.1.1.1:2": {
 								address:  "1.1.1.1:2",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
@@ -409,29 +411,37 @@ func Test_resyncRoutes(t *testing.T) {
 				includePrivate: true,
 				events:         map[string]string{},
 			},
-			want: map[string][]*endpointInfo{
+			want: map[string]map[string][]*endpointInfo{
 				"/cats": {
-					{
-						address:  "1.1.1.1:1",
-						lastSeen: now,
-						lastLoad: 0.0,
-					},
-					{
-						address:  "1.1.1.1:2",
-						lastSeen: now,
-						lastLoad: 0.0,
+					"main": {
+						{
+							address:  "1.1.1.1:1",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
+						{
+							address:  "1.1.1.1:2",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
 					},
 				},
 				"/kittens": {
-					{
-						address:  "1.1.1.1:1",
-						lastSeen: now,
-						lastLoad: 0.0,
-					},
-					{
-						address:  "1.1.1.1:2",
-						lastSeen: now,
-						lastLoad: 0.0,
+					"main": {
+						{
+							address:  "1.1.1.1:1",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
+						{
+							address:  "1.1.1.1:2",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
 					},
 				},
 			},
@@ -465,11 +475,13 @@ func Test_resyncRoutes(t *testing.T) {
 						endpoints: map[string]*endpointInfo{
 							"1.1.1.1:1": {
 								address:  "1.1.1.1:1",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
 							"1.1.1.1:2": {
 								address:  "1.1.1.1:2",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
@@ -479,17 +491,21 @@ func Test_resyncRoutes(t *testing.T) {
 				includePrivate: false,
 				events:         map[string]string{},
 			},
-			want: map[string][]*endpointInfo{
+			want: map[string]map[string][]*endpointInfo{
 				"/cats": {
-					{
-						address:  "1.1.1.1:1",
-						lastSeen: now,
-						lastLoad: 0.0,
-					},
-					{
-						address:  "1.1.1.1:2",
-						lastSeen: now,
-						lastLoad: 0.0,
+					"main": {
+						{
+							address:  "1.1.1.1:1",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
+						{
+							address:  "1.1.1.1:2",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
 					},
 				},
 			},
@@ -523,11 +539,13 @@ func Test_resyncRoutes(t *testing.T) {
 						endpoints: map[string]*endpointInfo{
 							"1.1.1.1:1": {
 								address:  "1.1.1.1:1",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
 							"1.1.1.1:2": {
 								address:  "1.1.1.1:2",
+								region:   "main",
 								lastSeen: now,
 								lastLoad: 0.0,
 							},
@@ -537,29 +555,37 @@ func Test_resyncRoutes(t *testing.T) {
 				includePrivate: false,
 				events:         map[string]string{"srv1": "evt1"},
 			},
-			want: map[string][]*endpointInfo{
+			want: map[string]map[string][]*endpointInfo{
 				"/cats": {
-					{
-						address:  "1.1.1.1:1",
-						lastSeen: now,
-						lastLoad: 0.0,
-					},
-					{
-						address:  "1.1.1.1:2",
-						lastSeen: now,
-						lastLoad: 0.0,
+					"main": {
+						{
+							address:  "1.1.1.1:1",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
+						{
+							address:  "1.1.1.1:2",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
 					},
 				},
 				"/evt1": {
-					{
-						address:  "1.1.1.1:1",
-						lastSeen: now,
-						lastLoad: 0.0,
-					},
-					{
-						address:  "1.1.1.1:2",
-						lastSeen: now,
-						lastLoad: 0.0,
+					"main": {
+						{
+							address:  "1.1.1.1:1",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
+						{
+							address:  "1.1.1.1:2",
+							region:   "main",
+							lastSeen: now,
+							lastLoad: 0.0,
+						},
 					},
 				},
 			},
@@ -571,16 +597,20 @@ func Test_resyncRoutes(t *testing.T) {
 			got := resyncRoutes(tt.args.services, tt.args.includePrivate, tt.args.events)
 
 			// sort this shit
-			for _, v := range tt.want {
-				sort.Slice(v, func(i, j int) bool {
-					return strings.Compare(v[i].address, v[j].address) == -1
-				})
+			for _, regions := range tt.want {
+				for _, v := range regions {
+					sort.Slice(v, func(i, j int) bool {
+						return strings.Compare(v[i].address, v[j].address) == -1
+					})
+				}
 			}
 
-			for _, v := range got {
-				sort.Slice(v, func(i, j int) bool {
-					return strings.Compare(v[i].address, v[j].address) == -1
-				})
+			for _, regions := range got {
+				for _, v := range regions {
+					sort.Slice(v, func(i, j int) bool {
+						return strings.Compare(v[i].address, v[j].address) == -1
+					})
+				}
 			}
 
 			if ShouldResemble(got, tt.want) != "" {

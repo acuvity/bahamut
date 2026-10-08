@@ -31,8 +31,8 @@ func Test_Services(t *testing.T) {
 				"identity-c": {Limit: 100, Burst: 200},
 			}
 
-			srv.registerEndpoint("1.1.1.1:4443", 0.3, rls1)
-			srv.registerEndpoint("2.2.2.2:4443", 0.4, rls2)
+			srv.registerEndpoint("1.1.1.1:4443", "main", 0.3, rls1)
+			srv.registerEndpoint("2.2.2.2:4443", "main", 0.4, rls2)
 
 			Convey("Then they should be registered", func() {
 

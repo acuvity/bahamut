@@ -456,6 +456,7 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	var upstream string
+	var region string
 	var interceptAction InterceptorAction
 	var err error
 
@@ -525,7 +526,9 @@ HANDLE_INTERCEPTION:
 	// we find it as usual.
 	if upstream == "" {
 
-		if upstream, err = s.upstreamer.Upstream(r); err != nil {
+		var up Upstream
+
+		if up, err = s.upstreamer.Upstream(r); err != nil {
 
 			switch {
 
@@ -545,7 +548,7 @@ HANDLE_INTERCEPTION:
 					"proto", r.Proto,
 					"path", r.URL.Path,
 					"ns", r.Header.Get("X-Namespace"),
-					"routed", upstream,
+					"routed", up.Address,
 					"scheme", s.gatewayConfig.upstreamURLScheme,
 					err,
 				)
@@ -556,6 +559,9 @@ HANDLE_INTERCEPTION:
 
 			return
 		}
+
+		upstream = up.Address
+		region = up.Region
 
 		if upstream == "" {
 			s.corsOriginInjectorFunc(w, r)
@@ -571,6 +577,7 @@ HANDLE_INTERCEPTION:
 		"path", r.URL.Path,
 		"ns", r.Header.Get("X-Namespace"),
 		"routed", upstream,
+		"region", region,
 		"scheme", s.gatewayConfig.upstreamURLScheme,
 	)
 
