@@ -59,6 +59,7 @@ func TestNonNotifier(t *testing.T) {
 				So(n.endpoint, ShouldEqual, "1.1.1.1:1")
 				So(n.limiters, ShouldResemble, limiters)
 				So(n.prefix, ShouldEqual, "")
+				So(n.region, ShouldEqual, "main")
 			})
 
 			for _, vr := range server.RoutesInfo() {
@@ -102,6 +103,7 @@ func TestNonNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusHello)
 					So(sping.Prefix, ShouldEqual, "")
+					So(sping.Region, ShouldEqual, "main")
 
 					var checked int
 					for _, vr := range sping.Routes {
@@ -168,6 +170,7 @@ func TestNonNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusGoodbye)
 					So(sping.Prefix, ShouldEqual, "")
+					So(sping.Region, ShouldEqual, "main")
 				})
 			})
 		})
@@ -206,6 +209,7 @@ func TestPrefixedNotifier(t *testing.T) {
 				OptionNotifierAnnounceRateLimits(limiters),
 				OptionNotifierPingInterval(time.Second),
 				OptionNotifierPrefix("prefix"),
+				OptionNotifierAnnounceRegion("eu"),
 			)
 
 			Convey("Then n should be correct", func() {
@@ -216,6 +220,7 @@ func TestPrefixedNotifier(t *testing.T) {
 				So(n.endpoint, ShouldEqual, "1.1.1.1:1")
 				So(n.limiters, ShouldResemble, limiters)
 				So(n.prefix, ShouldEqual, "prefix")
+				So(n.region, ShouldEqual, "eu")
 			})
 
 			Convey("When I call MakeStartHook and call the hook", func() {
@@ -251,6 +256,7 @@ func TestPrefixedNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusHello)
 					So(sping.Prefix, ShouldEqual, "prefix")
+					So(sping.Region, ShouldEqual, "eu")
 
 					Convey("Then I wait 1.5sec and I should get another pusb", func() {
 
@@ -304,6 +310,7 @@ func TestPrefixedNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusGoodbye)
 					So(sping.Prefix, ShouldEqual, "prefix")
+					So(sping.Region, ShouldEqual, "eu")
 				})
 			})
 		})
