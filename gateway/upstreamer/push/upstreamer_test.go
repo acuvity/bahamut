@@ -416,6 +416,127 @@ func TestGlobalServiceTopic(t *testing.T) {
 	})
 }
 
+func TestUpstreamerRegion(t *testing.T) {
+
+	sendHelloPing := func(pubsub bahamut.PubSubClient, endpoint, region string) {
+		sping := &servicePing{
+			Name:     "srv1",
+			Endpoint: endpoint,
+			Region:   region,
+			Status:   entityStatusHello,
+			Routes: map[int][]bahamut.RouteInfo{
+				0: {
+					{
+						Identity: "cats",
+						URL:      "/cats",
+						Verbs:    []string{http.MethodGet},
+						Private:  false,
+					},
+				},
+			},
+			Versions: map[string]any{
+				"hello": "hey",
+			},
+			Load: 0.2,
+		}
+
+		pub := bahamut.NewPublication("topic")
+		if err := pub.Encode(sping); err != nil {
+			panic(err)
+		}
+
+		if err := pubsub.Publish(pub); err != nil {
+			panic(err)
+		}
+	}
+
+	Convey("Given I have an upstreamer in the eu and us regions", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+			OptionUpstreamerRegionFilter("eu", "us"),
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send pings from the eu, us and fr regions", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "eu")
+			sendHelloPing(pubsub, "2.2.2.2:1", "us")
+			sendHelloPing(pubsub, "3.3.3.3:1", "fr")
+			time.Sleep(time.Second)
+
+			Convey("Then only the eu and us endpoints should be routable", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]), ShouldEqual, 2)
+				So(u.apis["/cats"][0].address, ShouldBeIn, "1.1.1.1:1", "2.2.2.2:1")
+				So(u.apis["/cats"][1].address, ShouldBeIn, "1.1.1.1:1", "2.2.2.2:1")
+				So(u.apis["/cats"][0].address, ShouldNotEqual, u.apis["/cats"][1].address)
+				u.lock.Unlock()
+			})
+		})
+	})
+
+	Convey("Given I have an upstreamer with no configured regions", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send a ping with no region and one from the us region", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "")
+			sendHelloPing(pubsub, "2.2.2.2:1", "us")
+			time.Sleep(time.Second)
+
+			Convey("Then both endpoints should be routable", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]), ShouldEqual, 2)
+				So(u.apis["/cats"][0].address, ShouldBeIn, "1.1.1.1:1", "2.2.2.2:1")
+				So(u.apis["/cats"][1].address, ShouldBeIn, "1.1.1.1:1", "2.2.2.2:1")
+				So(u.apis["/cats"][0].address, ShouldNotEqual, u.apis["/cats"][1].address)
+				u.lock.Unlock()
+			})
+		})
+	})
+}
+
 type deterministicRandom struct {
 	value int
 }
