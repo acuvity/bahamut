@@ -75,7 +75,7 @@ func (s *requestRewriter) Rewrite(r *httputil.ProxyRequest) {
 			panic(fmt.Sprintf("unable to handle client TLS certificate: %s", err)) // panic are recovered from oxy
 		}
 
-		r.Out.Header.Add("X-TLS-Client-Certificate", strings.ReplaceAll(string(pem.EncodeToMemory(block)), "\n", " "))
+		r.Out.Header.Set("X-TLS-Client-Certificate", strings.ReplaceAll(string(pem.EncodeToMemory(block)), "\n", " "))
 	}
 }
 
