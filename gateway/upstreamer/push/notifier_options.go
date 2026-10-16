@@ -13,6 +13,7 @@ type notifierConfig struct {
 	hiddenAPIs       map[string]bool
 	prefix           string
 	region           string
+	foreignEndpoint  string
 	pingInterval     time.Duration
 }
 
@@ -63,6 +64,17 @@ func OptionNotifierPrefix(prefix string) NotifierOption {
 func OptionNotifierAnnounceRegion(region string) NotifierOption {
 	return func(c *notifierConfig) {
 		c.region = region
+	}
+}
+
+// OptionNotifierAnnounceForeignEndpoint sets an alternative endpoint
+// through which the service can be reached from foreign regions.
+// Gateways that live in another region than the service will use
+// this endpoint instead of the local one. If not set, the service
+// is only reachable from its own region.
+func OptionNotifierAnnounceForeignEndpoint(endpoint string) NotifierOption {
+	return func(c *notifierConfig) {
+		c.foreignEndpoint = endpoint
 	}
 }
 
