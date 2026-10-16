@@ -14,6 +14,7 @@ type endpointInfo struct {
 	sync.RWMutex
 	limiters IdentityToAPILimitersRegistry
 	address  string
+	region   string
 	lastLoad float64
 }
 
@@ -53,7 +54,7 @@ func (b *service) hasEndpoint(ep string) bool {
 	return ok
 }
 
-func (b *service) registerEndpoint(address string, load float64, apilimiters IdentityToAPILimitersRegistry) {
+func (b *service) registerEndpoint(address, region string, load float64, apilimiters IdentityToAPILimitersRegistry) {
 
 	if apilimiters == nil {
 		apilimiters = IdentityToAPILimitersRegistry{}
@@ -69,6 +70,7 @@ func (b *service) registerEndpoint(address string, load float64, apilimiters Ide
 		lastSeen: time.Now(),
 		lastLoad: load,
 		address:  address,
+		region:   region,
 		limiters: apilimiters,
 	}
 }

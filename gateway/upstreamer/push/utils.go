@@ -44,7 +44,7 @@ func handleAddServicePing(services servicesConfig, sp servicePing) bool {
 	srv.versions = sp.Versions
 
 	// We register the new endpoint.
-	srv.registerEndpoint(sp.Endpoint, sp.Load, sp.APILimiters)
+	srv.registerEndpoint(sp.Endpoint, sp.Region, sp.Load, sp.APILimiters)
 
 	return true
 }
@@ -75,9 +75,22 @@ func handleRemoveServicePing(services servicesConfig, sp servicePing) bool {
 	return true
 }
 
-func resyncRoutes(services servicesConfig, includePrivate bool, events map[string]string) map[string][]*endpointInfo {
+// regionalEndpoints groups the service's endpoints by the region
+// each one announced.
+func (b *service) regionalEndpoints() map[string][]*endpointInfo {
 
-	apis := map[string][]*endpointInfo{}
+	out := map[string][]*endpointInfo{}
+
+	for _, epi := range b.getEndpoints() {
+		out[epi.region] = append(out[epi.region], epi)
+	}
+
+	return out
+}
+
+func resyncRoutes(services servicesConfig, includePrivate bool, events map[string]string) map[string]map[string][]*endpointInfo {
+
+	apis := map[string]map[string][]*endpointInfo{}
 
 	for serviceName, config := range services {
 
@@ -86,13 +99,13 @@ func resyncRoutes(services servicesConfig, includePrivate bool, events map[strin
 		for _, routes := range config.routes {
 			for _, route := range routes {
 				if !route.Private || includePrivate {
-					apis[prefix+"/"+route.Identity] = append([]*endpointInfo{}, config.getEndpoints()...)
+					apis[prefix+"/"+route.Identity] = config.regionalEndpoints()
 				}
 			}
 		}
 
 		if api, ok := events[name]; ok {
-			apis[prefix+"/"+api] = append([]*endpointInfo{}, config.getEndpoints()...)
+			apis[prefix+"/"+api] = config.regionalEndpoints()
 		}
 	}
 

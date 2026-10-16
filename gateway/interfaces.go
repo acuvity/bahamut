@@ -14,6 +14,14 @@ import (
 // the client.
 var ErrUpstreamerTooManyRequests = errors.New("please retry in a moment")
 
+// An Upstream is the result of an Upstreamer's Upstream call.
+// It carries the address to route the request to and the
+// region the endpoint belongs to.
+type Upstream struct {
+	Address string
+	Region  string
+}
+
 // An Upstreamer is the interface that can compute upstreams.
 type Upstreamer interface {
 
@@ -25,14 +33,15 @@ type Upstreamer interface {
 	//
 	// The request state must not be changed from this function.
 	//
-	// The returned upstream is a string in the form "https://10.3.19.4".
-	// If it is empty, the bahamut.Gayeway will return a
+	// The returned Upstream carries the address to route the request to,
+	// in the form "10.3.19.4:443", and the region the endpoint belongs to.
+	// If the address is empty, the bahamut.Gayeway will return a
 	// 503 Service Unavailable error.
 	//
 	// If Upstream returns an error, the bahamut.Gayeway will check for a
 	// known ErrUpstreamerX and will act accordingly. Otherwise it will
 	// return the error as a 500 Internal Server Error.
-	Upstream(req *http.Request) (upstream string, err error)
+	Upstream(req *http.Request) (upstream Upstream, err error)
 }
 
 // A SourceExtractor is used to extract a token (or key) used

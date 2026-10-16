@@ -17,8 +17,8 @@ import (
 // observes is the buffering and nothing else.
 type anyUpstreamer struct{ srv *httptest.Server }
 
-func (u *anyUpstreamer) Upstream(req *http.Request) (string, error) {
-	return strings.Replace(u.srv.URL, "https://", "", 1), nil
+func (u *anyUpstreamer) Upstream(req *http.Request) (Upstream, error) {
+	return Upstream{Address: strings.Replace(u.srv.URL, "https://", "", 1)}, nil
 }
 
 // A declared identity reaches its upstream with a body larger than the

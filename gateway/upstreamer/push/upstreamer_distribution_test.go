@@ -16,19 +16,21 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 	Convey("Given I have an upstreamer with 3 registered apis with different loads", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 10.0,
-				},
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 10.0,
-				},
-				{
-					address:  "3.3.3.3:1",
-					lastLoad: 81.0,
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 10.0,
+					},
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 10.0,
+					},
+					{
+						address:  "3.3.3.3:1",
+						lastLoad: 81.0,
+					},
 				},
 			},
 		}
@@ -41,7 +43,7 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 				upstream, _ := u.Upstream(&http.Request{
 					URL: &url.URL{Path: "/cats"},
 				})
-				counts[upstream]++
+				counts[upstream.Address]++
 			}
 
 			Convey("Then the repoartition should be correct", func() {
@@ -54,18 +56,20 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 	Convey("Given I have an upstreamer with 1 not loaded/ratelimited and one loaded/not ratelimited", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 10.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": {limiter: rate.NewLimiter(rate.Limit(1), 1)},
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 10.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": {limiter: rate.NewLimiter(rate.Limit(1), 1)},
+						},
 					},
-				},
-				{
-					address:  "3.3.3.3:1",
-					lastLoad: 81.0,
+					{
+						address:  "3.3.3.3:1",
+						lastLoad: 81.0,
+					},
 				},
 			},
 		}
@@ -78,7 +82,7 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 				upstream, _ := u.Upstream(&http.Request{
 					URL: &url.URL{Path: "/cats"},
 				})
-				counts[upstream]++
+				counts[upstream.Address]++
 			}
 
 			Convey("Then the repoartition should be correct", func() {
@@ -91,17 +95,19 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 	Convey("Given I have an upstreamer with 1 not loaded/not ratelimited and one loaded/ratelimited", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 10.0,
-				},
-				{
-					address:  "3.3.3.3:1",
-					lastLoad: 81.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": {limiter: rate.NewLimiter(rate.Limit(1), 1)},
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 10.0,
+					},
+					{
+						address:  "3.3.3.3:1",
+						lastLoad: 81.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": {limiter: rate.NewLimiter(rate.Limit(1), 1)},
+						},
 					},
 				},
 			},
@@ -115,7 +121,7 @@ func TestUpstreamUpstreamerDistribution(t *testing.T) {
 				upstream, _ := u.Upstream(&http.Request{
 					URL: &url.URL{Path: "/cats"},
 				})
-				counts[upstream]++
+				counts[upstream.Address]++
 			}
 
 			Convey("Then the repoartition should be correct", func() {
@@ -186,7 +192,7 @@ func TestLatencyBasedUpstreamer(t *testing.T) {
 				u.CollectLatency("bar", 1*time.Microsecond)
 			}
 
-			for i := 0; i < 100; i++ {
+			for range 100 {
 				wg.Add(1)
 				go inc()
 			}

@@ -59,6 +59,8 @@ func TestNonNotifier(t *testing.T) {
 				So(n.endpoint, ShouldEqual, "1.1.1.1:1")
 				So(n.limiters, ShouldResemble, limiters)
 				So(n.prefix, ShouldEqual, "")
+				So(n.region, ShouldEqual, "main")
+				So(n.foreignEndpoint, ShouldEqual, "")
 			})
 
 			for _, vr := range server.RoutesInfo() {
@@ -102,6 +104,7 @@ func TestNonNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusHello)
 					So(sping.Prefix, ShouldEqual, "")
+					So(sping.Region, ShouldEqual, "main")
 
 					var checked int
 					for _, vr := range sping.Routes {
@@ -168,6 +171,7 @@ func TestNonNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusGoodbye)
 					So(sping.Prefix, ShouldEqual, "")
+					So(sping.Region, ShouldEqual, "main")
 				})
 			})
 		})
@@ -206,6 +210,7 @@ func TestPrefixedNotifier(t *testing.T) {
 				OptionNotifierAnnounceRateLimits(limiters),
 				OptionNotifierPingInterval(time.Second),
 				OptionNotifierPrefix("prefix"),
+				OptionNotifierAnnounceRegion("eu"),
 			)
 
 			Convey("Then n should be correct", func() {
@@ -216,6 +221,7 @@ func TestPrefixedNotifier(t *testing.T) {
 				So(n.endpoint, ShouldEqual, "1.1.1.1:1")
 				So(n.limiters, ShouldResemble, limiters)
 				So(n.prefix, ShouldEqual, "prefix")
+				So(n.region, ShouldEqual, "eu")
 			})
 
 			Convey("When I call MakeStartHook and call the hook", func() {
@@ -251,6 +257,7 @@ func TestPrefixedNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusHello)
 					So(sping.Prefix, ShouldEqual, "prefix")
+					So(sping.Region, ShouldEqual, "eu")
 
 					Convey("Then I wait 1.5sec and I should get another pusb", func() {
 
@@ -304,6 +311,112 @@ func TestPrefixedNotifier(t *testing.T) {
 					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
 					So(sping.Status, ShouldEqual, entityStatusGoodbye)
 					So(sping.Prefix, ShouldEqual, "prefix")
+					So(sping.Region, ShouldEqual, "eu")
+				})
+			})
+		})
+	})
+}
+
+func TestForeignEndpointNotifier(t *testing.T) {
+
+	Convey("Given I have a pubsub client and a bahamut server", t, func() {
+
+		server := bahamut.New(
+			bahamut.OptModel(
+				map[int]elemental.ModelManager{
+					0: testmodel.Manager(),
+				},
+			),
+		)
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		errCh := make(chan error, 10)
+		pubCh := make(chan *bahamut.Publication, 10)
+		defer pubsub.Subscribe(pubCh, errCh, "topic")()
+
+		Convey("When I call NewNotifier with a foreign endpoint", func() {
+
+			n := NewNotifier(
+				pubsub,
+				"topic",
+				"srv1",
+				"1.1.1.1:1",
+				OptionNotifierAnnounceForeignEndpoint("10.0.0.1:1"),
+			)
+
+			Convey("Then n should be correct", func() {
+				So(n.foreignEndpoint, ShouldEqual, "10.0.0.1:1")
+			})
+
+			Convey("When I call MakeStartHook and call the hook", func() {
+
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				hook := n.MakeStartHook(ctx)
+
+				err := hook(server)
+
+				Convey("Then err should be nil", func() {
+					So(err, ShouldBeNil)
+				})
+
+				var p *bahamut.Publication
+				select {
+				case <-time.After(300 * time.Millisecond):
+				case p = <-pubCh:
+				}
+
+				Convey("Then the pubsub should have received a push", func() {
+
+					So(p, ShouldNotBeNil)
+
+					sping := &servicePing{}
+					if err := p.Decode(sping); err != nil {
+						panic(err)
+					}
+
+					So(sping.Key(), ShouldEqual, "srv1")
+					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
+					So(sping.ForeignEndpoint, ShouldEqual, "10.0.0.1:1")
+					So(sping.Status, ShouldEqual, entityStatusHello)
+				})
+			})
+
+			Convey("When I call MakeStopHook and call the hook", func() {
+
+				hook := n.MakeStopHook()
+
+				err := hook(server)
+
+				Convey("Then err should be nil", func() {
+					So(err, ShouldBeNil)
+				})
+
+				var p *bahamut.Publication
+				select {
+				case <-time.After(300 * time.Millisecond):
+				case p = <-pubCh:
+				}
+
+				Convey("Then the pubsub should have received a push", func() {
+
+					So(p, ShouldNotBeNil)
+
+					sping := &servicePing{}
+					if err := p.Decode(sping); err != nil {
+						panic(err)
+					}
+
+					So(sping.Key(), ShouldEqual, "srv1")
+					So(sping.Endpoint, ShouldEqual, "1.1.1.1:1")
+					So(sping.ForeignEndpoint, ShouldEqual, "10.0.0.1:1")
+					So(sping.Status, ShouldEqual, entityStatusGoodbye)
 				})
 			})
 		})

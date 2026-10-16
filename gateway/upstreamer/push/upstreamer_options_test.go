@@ -2,6 +2,7 @@ package push
 
 import (
 	"math/rand"
+	"net/http"
 	"testing"
 	"time"
 
@@ -74,5 +75,16 @@ func Test_Options(t *testing.T) {
 	Convey("Calling OptionUpstreamerGlobalServiceTopic should work", t, func() {
 		OptionUpstreamerGlobalServiceTopic("global")(&c)
 		So(c.globalServiceTopic, ShouldEqual, "global")
+	})
+
+	Convey("Calling OptionUpstreamerRegionExtractor should work", t, func() {
+		extractor := func(r *http.Request) string { return "eu" }
+		OptionUpstreamerRegionExtractor(extractor)(&c)
+		So(c.regionExtractor, ShouldEqual, extractor)
+	})
+
+	Convey("Calling OptionUpstreamerOwnRegion should work", t, func() {
+		OptionUpstreamerOwnRegion("eu")(&c)
+		So(c.ownRegion, ShouldEqual, "eu")
 	})
 }

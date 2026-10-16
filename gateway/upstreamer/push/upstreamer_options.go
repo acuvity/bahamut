@@ -16,6 +16,9 @@ type upstreamConfig struct {
 	overrideEndpointAddress     string
 	globalServiceTopic          string
 	requiredServices            []string
+	regions                     map[string]struct{}
+	regionExtractor             RegionExtractor
+	ownRegion                   string
 	serviceTimeoutCheckInterval time.Duration
 	serviceTimeout              time.Duration
 	peerTimeout                 time.Duration
@@ -39,6 +42,9 @@ func newUpstreamConfig() upstreamConfig {
 		randomizer:                  newRandomizer(),
 		tokenLimitingBurst:          2000,
 		tokenLimitingRPS:            500,
+		regions:                     map[string]struct{}{},
+		regionExtractor:             defaultRegionExtractor,
+		ownRegion:                   defaultRegion,
 	}
 }
 
@@ -145,5 +151,37 @@ func OptionUpstreamerTokenRateLimiting(rps rate.Limit, burst int) UpstreamerOpti
 func OptionUpstreamerGlobalServiceTopic(topic string) UpstreamerOption {
 	return func(cfg *upstreamConfig) {
 		cfg.globalServiceTopic = topic
+	}
+}
+
+// OptionUpstreamerRegionFilter sets the list of regions the gateway cares
+// about. The upstreamer will only route requests to services that announce
+// one of these regions. By default the list is empty and all regions are
+// accepted.
+func OptionUpstreamerRegionFilter(regions ...string) UpstreamerOption {
+	return func(cfg *upstreamConfig) {
+		cfg.regions = make(map[string]struct{}, len(regions))
+		for _, r := range regions {
+			cfg.regions[r] = struct{}{}
+		}
+	}
+}
+
+// OptionUpstreamerRegionExtractor sets the function used to extract the
+// desired region from incoming requests. By default, the X-Region header
+// is read, falling back to "main".
+func OptionUpstreamerRegionExtractor(extractor RegionExtractor) UpstreamerOption {
+	return func(cfg *upstreamConfig) {
+		cfg.regionExtractor = extractor
+	}
+}
+
+// OptionUpstreamerOwnRegion sets the region the upstreamer itself
+// lives in. Services that announce this region are registered with
+// their local endpoint, services from other regions are registered
+// with their foreign endpoint. The default is "main".
+func OptionUpstreamerOwnRegion(region string) UpstreamerOption {
+	return func(cfg *upstreamConfig) {
+		cfg.ownRegion = region
 	}
 }

@@ -26,15 +26,17 @@ type APILimiter struct {
 type IdentityToAPILimitersRegistry map[string]*APILimiter
 
 type servicePing struct {
-	Routes       map[int][]bahamut.RouteInfo
-	Versions     map[string]any
-	APILimiters  IdentityToAPILimitersRegistry
-	Name         string
-	Endpoint     string
-	PushEndpoint string
-	Prefix       string
-	Status       entityStatus
-	Load         float64
+	Routes          map[int][]bahamut.RouteInfo
+	Versions        map[string]any
+	APILimiters     IdentityToAPILimitersRegistry
+	Name            string
+	Endpoint        string
+	ForeignEndpoint string
+	PushEndpoint    string
+	Prefix          string
+	Region          string
+	Status          entityStatus
+	Load            float64
 }
 
 // Key returns the key for the service.

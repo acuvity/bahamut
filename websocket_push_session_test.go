@@ -168,12 +168,12 @@ func TestWSPushSession_send(t *testing.T) {
 
 		Convey("When I call directPush and overflow it", func() {
 
-			for i := 0; i < 2000; i++ {
+			for range 2000 {
 				s.send([]byte("hello"))
 			}
 
 			var total int
-			for i := 0; i < 2000; i++ {
+			for range 2000 {
 				select {
 				case <-s.dataCh:
 					total++
