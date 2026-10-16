@@ -82,4 +82,9 @@ func Test_Options(t *testing.T) {
 		OptionUpstreamerRegionExtractor(extractor)(&c)
 		So(c.regionExtractor, ShouldEqual, extractor)
 	})
+
+	Convey("Calling OptionUpstreamerOwnRegion should work", t, func() {
+		OptionUpstreamerOwnRegion("eu")(&c)
+		So(c.ownRegion, ShouldEqual, "eu")
+	})
 }

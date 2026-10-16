@@ -418,12 +418,13 @@ func TestGlobalServiceTopic(t *testing.T) {
 
 func TestUpstreamerRegion(t *testing.T) {
 
-	sendHelloPing := func(pubsub bahamut.PubSubClient, endpoint, region string) {
+	sendHelloPing := func(pubsub bahamut.PubSubClient, endpoint, remoteEndpoint, region string) {
 		sping := &servicePing{
-			Name:     "srv1",
-			Endpoint: endpoint,
-			Region:   region,
-			Status:   entityStatusHello,
+			Name:            "srv1",
+			Endpoint:        endpoint,
+			ForeignEndpoint: remoteEndpoint,
+			Region:          region,
+			Status:          entityStatusHello,
 			Routes: map[int][]bahamut.RouteInfo{
 				0: {
 					{
@@ -477,18 +478,18 @@ func TestUpstreamerRegion(t *testing.T) {
 
 		Convey("When I send pings from the eu, us and fr regions", func() {
 
-			sendHelloPing(pubsub, "1.1.1.1:1", "eu")
-			sendHelloPing(pubsub, "2.2.2.2:1", "us")
-			sendHelloPing(pubsub, "3.3.3.3:1", "fr")
+			sendHelloPing(pubsub, "1.1.1.1:1", "10.0.0.1:1", "eu")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			sendHelloPing(pubsub, "3.3.3.3:1", "10.0.0.3:1", "fr")
 			time.Sleep(time.Second)
 
-			Convey("Then only the eu and us endpoints should be routable", func() {
+			Convey("Then only the eu and us foreign endpoints should be routable", func() {
 
 				u.lock.Lock()
 				So(len(u.apis["/cats"]["eu"]), ShouldEqual, 1)
-				So(u.apis["/cats"]["eu"][0].address, ShouldEqual, "1.1.1.1:1")
+				So(u.apis["/cats"]["eu"][0].address, ShouldEqual, "10.0.0.1:1")
 				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
-				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "2.2.2.2:1")
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
 				_, fr := u.apis["/cats"]["fr"]
 				So(fr, ShouldBeFalse)
 				u.lock.Unlock()
@@ -520,19 +521,65 @@ func TestUpstreamerRegion(t *testing.T) {
 			panic("not ready in time")
 		}
 
-		Convey("When I send a ping with no region and one from the us region", func() {
+		Convey("When I send a ping from my region, one foreign with a foreign endpoint and one without", func() {
 
-			sendHelloPing(pubsub, "1.1.1.1:1", "")
-			sendHelloPing(pubsub, "2.2.2.2:1", "us")
+			sendHelloPing(pubsub, "1.1.1.1:1", "", "")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			sendHelloPing(pubsub, "3.3.3.3:1", "", "fr")
 			time.Sleep(time.Second)
 
-			Convey("Then both endpoints should be routable", func() {
+			Convey("Then the local and the foreign endpoints should be routable, the unreachable one not", func() {
 
 				u.lock.Lock()
 				So(len(u.apis["/cats"]["main"]), ShouldEqual, 1)
 				So(u.apis["/cats"]["main"][0].address, ShouldEqual, "1.1.1.1:1")
 				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
-				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "2.2.2.2:1")
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
+				_, fr := u.apis["/cats"]["fr"]
+				So(fr, ShouldBeFalse)
+				u.lock.Unlock()
+			})
+		})
+	})
+
+	Convey("Given I have an upstreamer living in the eu region", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+			OptionUpstreamerOwnRegion("eu"),
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send a ping from eu and one from us", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "10.0.0.1:1", "eu")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			time.Sleep(time.Second)
+
+			Convey("Then the eu local endpoint and the us foreign endpoint should be routable", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]["eu"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["eu"][0].address, ShouldEqual, "1.1.1.1:1")
+				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
 				u.lock.Unlock()
 			})
 		})
