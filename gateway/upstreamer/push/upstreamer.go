@@ -415,6 +415,17 @@ func (c *Upstreamer) listenServices(ctx context.Context, ready chan struct{}) {
 				}
 			}
 
+			// Services from our own region are reached through
+			// their local endpoint. Services from other regions
+			// are only reachable through their foreign endpoint.
+			if sp.Region != c.config.ownRegion {
+				if sp.ForeignEndpoint == "" {
+					break
+				}
+
+				sp.Endpoint = sp.ForeignEndpoint
+			}
+
 			switch sp.Status {
 			case entityStatusHello:
 

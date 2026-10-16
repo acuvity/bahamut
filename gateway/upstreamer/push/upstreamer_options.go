@@ -18,6 +18,7 @@ type upstreamConfig struct {
 	requiredServices            []string
 	regions                     map[string]struct{}
 	regionExtractor             RegionExtractor
+	ownRegion                   string
 	serviceTimeoutCheckInterval time.Duration
 	serviceTimeout              time.Duration
 	peerTimeout                 time.Duration
@@ -43,6 +44,7 @@ func newUpstreamConfig() upstreamConfig {
 		tokenLimitingRPS:            500,
 		regions:                     map[string]struct{}{},
 		regionExtractor:             defaultRegionExtractor,
+		ownRegion:                   defaultRegion,
 	}
 }
 
@@ -171,5 +173,15 @@ func OptionUpstreamerRegionFilter(regions ...string) UpstreamerOption {
 func OptionUpstreamerRegionExtractor(extractor RegionExtractor) UpstreamerOption {
 	return func(cfg *upstreamConfig) {
 		cfg.regionExtractor = extractor
+	}
+}
+
+// OptionUpstreamerOwnRegion sets the region the upstreamer itself
+// lives in. Services that announce this region are registered with
+// their local endpoint, services from other regions are registered
+// with their foreign endpoint. The default is "main".
+func OptionUpstreamerOwnRegion(region string) UpstreamerOption {
+	return func(cfg *upstreamConfig) {
+		cfg.ownRegion = region
 	}
 }
