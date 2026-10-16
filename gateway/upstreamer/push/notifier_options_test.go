@@ -22,6 +22,11 @@ func Test_NotiferOptions(t *testing.T) {
 		So(c.rateLimits, ShouldNotEqual, rls)
 	})
 
+	Convey("Calling OptionNotifierAnnounceForeignEndpoint should work", t, func() {
+		OptionNotifierAnnounceForeignEndpoint("10.0.0.1:1")(&c)
+		So(c.foreignEndpoint, ShouldEqual, "10.0.0.1:1")
+	})
+
 	Convey("Calling OptionNotifierPingInterval should work", t, func() {
 		OptionNotifierPingInterval(3 * time.Hour)(&c)
 		So(c.pingInterval, ShouldEqual, 3*time.Hour)
