@@ -13,6 +13,7 @@ package bahamut
 
 import (
 	"context"
+	"maps"
 	"net/http"
 	"sync"
 
@@ -180,9 +181,7 @@ func (c *bcontext) ClaimsMap() map[string]string {
 
 	o := make(map[string]string, len(c.claimsMap))
 
-	for k, v := range c.claimsMap {
-		o[k] = v
-	}
+	maps.Copy(o, c.claimsMap)
 
 	return o
 }
@@ -226,15 +225,11 @@ func (c *bcontext) Duplicate() Context {
 	c2.disableOutputDataPush = c.disableOutputDataPush
 	c2.originalData = c.originalData
 
-	for k, v := range c.claimsMap {
-		c2.claimsMap[k] = v
-	}
+	maps.Copy(c2.claimsMap, c.claimsMap)
 
 	if c.metadata != nil {
 		c2.metadata = map[any]any{}
-		for k, v := range c.metadata {
-			c2.metadata[k] = v
-		}
+		maps.Copy(c2.metadata, c.metadata)
 	}
 
 	return c2
