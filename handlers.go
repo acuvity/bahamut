@@ -18,6 +18,7 @@ import (
 	"log/slog"
 	"net/http"
 	"runtime/debug"
+	"strings"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
@@ -84,9 +85,15 @@ func makeResponse(ctx *bcontext, response *elemental.Response, marshallers map[e
 		return response
 	}
 
+	// Browsers merge repeated headers into one comma-separated line,
+	// so accept both forms.
 	var requestedFields []string
-	if ctx.Request().Headers != nil {
-		requestedFields = ctx.Request().Headers["X-Fields"]
+	for _, v := range ctx.Request().Headers.Values("X-Fields") {
+		for f := range strings.SplitSeq(v, ",") {
+			if f = strings.TrimSpace(f); f != "" {
+				requestedFields = append(requestedFields, f)
+			}
+		}
 	}
 
 	elemental.ResetSecretAttributesValues(ctx.outputData)

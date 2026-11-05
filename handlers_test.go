@@ -316,6 +316,36 @@ func TestHandlers_makeResponse(t *testing.T) {
 		})
 	})
 
+	Convey("Given I have context with a comma-separated X-Fields header and indentifiable output data", t, func() {
+
+		req := elemental.NewRequest()
+		req.Headers.Add("X-Fields", "name, ID,, ")
+
+		ctx := newContext(context.Background(), req)
+		response := elemental.NewResponse(req)
+		ctx.outputData = testmodel.ListsList{
+			&testmodel.List{
+				Name:        "the name",
+				ID:          "xxx",
+				Description: " the description",
+			},
+			&testmodel.List{
+				Name:        "the name2",
+				ID:          "xxx2",
+				Description: " the description2",
+			},
+		}
+
+		Convey("When I call makeResponse", func() {
+
+			resp := makeResponse(ctx, response, nil)
+
+			Convey("Then output data should be correct", func() {
+				So(string(resp.Data), ShouldEqual, `[{"ID":"xxx","name":"the name"},{"ID":"xxx2","name":"the name2"}]`)
+			})
+		})
+	})
+
 	Convey("Given I have context indentifiable output data and custom working marshaller", t, func() {
 
 		req := elemental.NewRequest()
