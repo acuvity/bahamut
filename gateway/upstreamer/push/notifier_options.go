@@ -1,6 +1,7 @@
 package push
 
 import (
+	"maps"
 	"time"
 
 	"go.acuvity.ai/elemental"
@@ -11,6 +12,8 @@ type notifierConfig struct {
 	privateOverrides map[string]bool
 	hiddenAPIs       map[string]bool
 	prefix           string
+	region           string
+	foreignEndpoint  string
 	pingInterval     time.Duration
 }
 
@@ -20,6 +23,7 @@ func newNotifierConfig() notifierConfig {
 		pingInterval:     5 * time.Second,
 		privateOverrides: map[string]bool{},
 		hiddenAPIs:       map[string]bool{},
+		region:           defaultRegion,
 	}
 }
 
@@ -43,9 +47,7 @@ func OptionNotifierPingInterval(interval time.Duration) NotifierOption {
 func OptionNotifierAnnounceRateLimits(rls IdentityToAPILimitersRegistry) NotifierOption {
 	return func(c *notifierConfig) {
 		c.rateLimits = make(IdentityToAPILimitersRegistry, len(rls))
-		for k, v := range rls {
-			c.rateLimits[k] = v
-		}
+		maps.Copy(c.rateLimits, rls)
 	}
 }
 
@@ -54,6 +56,25 @@ func OptionNotifierAnnounceRateLimits(rls IdentityToAPILimitersRegistry) Notifie
 func OptionNotifierPrefix(prefix string) NotifierOption {
 	return func(c *notifierConfig) {
 		c.prefix = prefix
+	}
+}
+
+// OptionNotifierAnnounceRegion sets the region that the notifier
+// announces in its pings. The default is "main".
+func OptionNotifierAnnounceRegion(region string) NotifierOption {
+	return func(c *notifierConfig) {
+		c.region = region
+	}
+}
+
+// OptionNotifierAnnounceForeignEndpoint sets an alternative endpoint
+// through which the service can be reached from foreign regions.
+// Gateways that live in another region than the service will use
+// this endpoint instead of the local one. If not set, the service
+// is only reachable from its own region.
+func OptionNotifierAnnounceForeignEndpoint(endpoint string) NotifierOption {
+	return func(c *notifierConfig) {
+		c.foreignEndpoint = endpoint
 	}
 }
 

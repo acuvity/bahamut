@@ -67,7 +67,7 @@ func TestUpstreamer(t *testing.T) {
 			So(u, ShouldNotBeNil)
 			So(u.pubsub, ShouldEqual, pubsub)
 			So(u.serviceStatusTopic, ShouldEqual, "topic")
-			So(u.apis, ShouldResemble, map[string][]*endpointInfo{})
+			So(u.apis, ShouldResemble, map[string]map[string][]*endpointInfo{})
 		})
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -89,7 +89,7 @@ func TestUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be empty", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldBeEmpty)
+				So(upstream.Address, ShouldBeEmpty)
 			})
 		})
 
@@ -101,7 +101,7 @@ func TestUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be empty", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldBeEmpty)
+				So(upstream.Address, ShouldBeEmpty)
 			})
 		})
 
@@ -194,11 +194,11 @@ func TestUpstreamer(t *testing.T) {
 
 					Convey("Then upstream should be correct", func() {
 						So(err, ShouldBeNil)
-						So(upstream, ShouldEqual, "127.0.0.1:1")
-						So(len(u.apis["/cats"]), ShouldEqual, 1)
-						So(u.apis["/cats"][0].address, ShouldEqual, "127.0.0.1:1")
-						So(u.apis["/cats"][0].lastLoad, ShouldEqual, 0.2)
-						So(u.apis["/cats"][0].lastSeen.Round(time.Second), ShouldEqual, time.Now().Add(-time.Second).Round(time.Second))
+						So(upstream.Address, ShouldEqual, "127.0.0.1:1")
+						So(len(u.apis["/cats"]["main"]), ShouldEqual, 1)
+						So(u.apis["/cats"]["main"][0].address, ShouldEqual, "127.0.0.1:1")
+						So(u.apis["/cats"]["main"][0].lastLoad, ShouldEqual, 0.2)
+						So(u.apis["/cats"]["main"][0].lastSeen.Round(time.Second), ShouldEqual, time.Now().Add(-time.Second).Round(time.Second))
 					})
 
 					Convey("When I wait 2 seconds", func() {
@@ -213,8 +213,8 @@ func TestUpstreamer(t *testing.T) {
 
 							Convey("Then upstream should be correct", func() {
 								So(err, ShouldBeNil)
-								So(upstream, ShouldEqual, "")
-								So(len(u.apis["/cats"]), ShouldEqual, 0)
+								So(upstream.Address, ShouldEqual, "")
+								So(len(u.apis["/cats"]["main"]), ShouldEqual, 0)
 							})
 						})
 					})
@@ -228,11 +228,11 @@ func TestUpstreamer(t *testing.T) {
 
 					Convey("Then upstream should be correct", func() {
 						So(err, ShouldBeNil)
-						So(upstream, ShouldEqual, "127.0.0.1:2")
-						So(len(u.apis["prefix/cats"]), ShouldEqual, 1)
-						So(u.apis["prefix/cats"][0].address, ShouldEqual, "127.0.0.1:2")
-						So(u.apis["prefix/cats"][0].lastLoad, ShouldEqual, 0.2)
-						So(u.apis["prefix/cats"][0].lastSeen.Round(time.Second), ShouldEqual, time.Now().Add(-time.Second).Round(time.Second))
+						So(upstream.Address, ShouldEqual, "127.0.0.1:2")
+						So(len(u.apis["prefix/cats"]["main"]), ShouldEqual, 1)
+						So(u.apis["prefix/cats"]["main"][0].address, ShouldEqual, "127.0.0.1:2")
+						So(u.apis["prefix/cats"]["main"][0].lastLoad, ShouldEqual, 0.2)
+						So(u.apis["prefix/cats"]["main"][0].lastSeen.Round(time.Second), ShouldEqual, time.Now().Add(-time.Second).Round(time.Second))
 					})
 
 					Convey("When I wait 2 seconds", func() {
@@ -247,8 +247,8 @@ func TestUpstreamer(t *testing.T) {
 
 							Convey("Then upstream should be correct", func() {
 								So(err, ShouldBeNil)
-								So(upstream, ShouldEqual, "")
-								So(len(u.apis["prefix/cats"]), ShouldEqual, 0)
+								So(upstream.Address, ShouldEqual, "")
+								So(len(u.apis["prefix/cats"]["main"]), ShouldEqual, 0)
 							})
 						})
 					})
@@ -280,9 +280,9 @@ func TestUpstreamer(t *testing.T) {
 
 					Convey("Then upstream should be correct", func() {
 						So(err, ShouldBeNil)
-						So(upstream, ShouldEqual, "")
-						So(len(u.apis["/cats"]), ShouldEqual, 0)
-						So(len(u.apis["prefix/cats"]), ShouldEqual, 1)
+						So(upstream.Address, ShouldEqual, "")
+						So(len(u.apis["/cats"]["main"]), ShouldEqual, 0)
+						So(len(u.apis["prefix/cats"]["main"]), ShouldEqual, 1)
 					})
 				})
 
@@ -294,9 +294,9 @@ func TestUpstreamer(t *testing.T) {
 
 					Convey("Then upstream should be correct", func() {
 						So(err, ShouldBeNil)
-						So(upstream, ShouldEqual, "127.0.0.1:2")
-						So(len(u.apis["/cats"]), ShouldEqual, 0)
-						So(len(u.apis["prefix/cats"]), ShouldEqual, 1)
+						So(upstream.Address, ShouldEqual, "127.0.0.1:2")
+						So(len(u.apis["/cats"]["main"]), ShouldEqual, 0)
+						So(len(u.apis["prefix/cats"]["main"]), ShouldEqual, 1)
 					})
 				})
 			})
@@ -397,7 +397,7 @@ func TestGlobalServiceTopic(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				u.lock.Lock()
-				So(len(u.apis["/cats"]), ShouldEqual, 1)
+				So(len(u.apis["/cats"]["main"]), ShouldEqual, 1)
 				u.lock.Unlock()
 			})
 
@@ -408,9 +408,179 @@ func TestGlobalServiceTopic(t *testing.T) {
 
 				Convey("Then upstream should be correct", func() {
 					u.lock.Lock()
-					So(len(u.apis["/cats"]), ShouldEqual, 2)
+					So(len(u.apis["/cats"]["main"]), ShouldEqual, 2)
 					u.lock.Unlock()
 				})
+			})
+		})
+	})
+}
+
+func TestUpstreamerRegion(t *testing.T) {
+
+	sendHelloPing := func(pubsub bahamut.PubSubClient, endpoint, remoteEndpoint, region string) {
+		sping := &servicePing{
+			Name:            "srv1",
+			Endpoint:        endpoint,
+			ForeignEndpoint: remoteEndpoint,
+			Region:          region,
+			Status:          entityStatusHello,
+			Routes: map[int][]bahamut.RouteInfo{
+				0: {
+					{
+						Identity: "cats",
+						URL:      "/cats",
+						Verbs:    []string{http.MethodGet},
+						Private:  false,
+					},
+				},
+			},
+			Versions: map[string]any{
+				"hello": "hey",
+			},
+			Load: 0.2,
+		}
+
+		pub := bahamut.NewPublication("topic")
+		if err := pub.Encode(sping); err != nil {
+			panic(err)
+		}
+
+		if err := pubsub.Publish(pub); err != nil {
+			panic(err)
+		}
+	}
+
+	Convey("Given I have an upstreamer in the eu and us regions", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+			OptionUpstreamerRegionFilter("eu", "us"),
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send pings from the eu, us and fr regions", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "10.0.0.1:1", "eu")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			sendHelloPing(pubsub, "3.3.3.3:1", "10.0.0.3:1", "fr")
+			time.Sleep(time.Second)
+
+			Convey("Then only the eu and us foreign endpoints should be routable", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]["eu"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["eu"][0].address, ShouldEqual, "10.0.0.1:1")
+				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
+				_, fr := u.apis["/cats"]["fr"]
+				So(fr, ShouldBeFalse)
+				u.lock.Unlock()
+			})
+		})
+	})
+
+	Convey("Given I have an upstreamer with no configured regions", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send a ping from my region, one foreign with a foreign endpoint and one without", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "", "")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			sendHelloPing(pubsub, "3.3.3.3:1", "", "fr")
+			time.Sleep(time.Second)
+
+			Convey("Then the local and the foreign endpoints should be routable, the unreachable one not", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]["main"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["main"][0].address, ShouldEqual, "1.1.1.1:1")
+				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
+				_, fr := u.apis["/cats"]["fr"]
+				So(fr, ShouldBeFalse)
+				u.lock.Unlock()
+			})
+		})
+	})
+
+	Convey("Given I have an upstreamer living in the eu region", t, func() {
+
+		pubsub := bahamut.NewLocalPubSubClient()
+		if err := pubsub.Connect(context.Background()); err != nil {
+			panic(err)
+		}
+
+		u := NewUpstreamer(
+			pubsub,
+			"topic",
+			"topic2",
+			OptionUpstreamerOwnRegion("eu"),
+		)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		ready, _ := u.Start(ctx)
+
+		select {
+		case <-ready:
+		case <-time.After(300 * time.Millisecond):
+			panic("not ready in time")
+		}
+
+		Convey("When I send a ping from eu and one from us", func() {
+
+			sendHelloPing(pubsub, "1.1.1.1:1", "10.0.0.1:1", "eu")
+			sendHelloPing(pubsub, "2.2.2.2:1", "10.0.0.2:1", "us")
+			time.Sleep(time.Second)
+
+			Convey("Then the eu local endpoint and the us foreign endpoint should be routable", func() {
+
+				u.lock.Lock()
+				So(len(u.apis["/cats"]["eu"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["eu"][0].address, ShouldEqual, "1.1.1.1:1")
+				So(len(u.apis["/cats"]["us"]), ShouldEqual, 1)
+				So(u.apis["/cats"]["us"][0].address, ShouldEqual, "10.0.0.2:1")
+				u.lock.Unlock()
 			})
 		})
 	})
@@ -437,19 +607,21 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 3 registered apis with different loads", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 10.0,
-				},
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 10.0,
-				},
-				{
-					address:  "3.3.3.3:1",
-					lastLoad: 81.0,
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 10.0,
+					},
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 10.0,
+					},
+					{
+						address:  "3.3.3.3:1",
+						lastLoad: 81.0,
+					},
 				},
 			},
 		}
@@ -462,8 +634,75 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldNotBeEmpty)
-				So(upstream, ShouldNotEqual, "3.3.3.3:1")
+				So(upstream.Address, ShouldNotBeEmpty)
+				So(upstream.Address, ShouldNotEqual, "3.3.3.3:1")
+			})
+		})
+	})
+
+	Convey("Given I have an upstreamer with the same api in two regions", t, func() {
+
+		u := NewUpstreamer(nil, "topic", "topic2")
+		u.apis = map[string]map[string][]*endpointInfo{
+			"/cats": {
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 0.1,
+					},
+				},
+				"eu": {
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 0.1,
+					},
+				},
+			},
+		}
+
+		Convey("When I call upstream on /cats with the X-Region header set to eu", func() {
+
+			r := &http.Request{
+				URL:    &url.URL{Path: "/cats"},
+				Header: http.Header{},
+			}
+			r.Header.Set("X-Region", "eu")
+
+			upstream, err := u.Upstream(r)
+
+			Convey("Then the eu endpoint should be returned", func() {
+				So(err, ShouldBeNil)
+				So(upstream.Address, ShouldEqual, "2.2.2.2:1")
+				So(upstream.Region, ShouldEqual, "eu")
+			})
+		})
+
+		Convey("When I call upstream on /cats without the X-Region header", func() {
+
+			upstream, err := u.Upstream(&http.Request{
+				URL: &url.URL{Path: "/cats"},
+			})
+
+			Convey("Then the main endpoint should be returned", func() {
+				So(err, ShouldBeNil)
+				So(upstream.Address, ShouldEqual, "1.1.1.1:1")
+				So(upstream.Region, ShouldEqual, "main")
+			})
+		})
+
+		Convey("When I call upstream on /cats with an unknown region", func() {
+
+			r := &http.Request{
+				URL:    &url.URL{Path: "/cats"},
+				Header: http.Header{},
+			}
+			r.Header.Set("X-Region", "us")
+
+			upstream, err := u.Upstream(r)
+
+			Convey("Then no upstream should be returned", func() {
+				So(err, ShouldBeNil)
+				So(upstream.Address, ShouldBeEmpty)
 			})
 		})
 	})
@@ -471,19 +710,21 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 3 registered apis with same loads", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 0.1,
-				},
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 0.1,
-				},
-				{
-					address:  "3.3.3.3:1",
-					lastLoad: 0.1,
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 0.1,
+					},
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 0.1,
+					},
+					{
+						address:  "3.3.3.3:1",
+						lastLoad: 0.1,
+					},
 				},
 			},
 		}
@@ -496,7 +737,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldNotBeEmpty)
+				So(upstream.Address, ShouldNotBeEmpty)
 			})
 		})
 	})
@@ -504,7 +745,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with not registered api", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{}
+		u.apis = map[string]map[string][]*endpointInfo{}
 
 		Convey("When I call upstream on /cats", func() {
 
@@ -514,7 +755,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldBeEmpty)
+				So(upstream.Address, ShouldBeEmpty)
 			})
 		})
 	})
@@ -522,11 +763,13 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with a single registered api", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2")
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 0.1,
+				"main": {
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 0.1,
+					},
 				},
 			},
 		}
@@ -539,7 +782,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldEqual, "1.1.1.1:1")
+				So(upstream.Address, ShouldEqual, "1.1.1.1:1")
 			})
 		})
 	})
@@ -547,15 +790,17 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 2 registered apis", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 3.0,
-				},
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 2.0,
+				"main": {
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 3.0,
+					},
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 2.0,
+					},
 				},
 			},
 		}
@@ -568,7 +813,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldEqual, "2.2.2.2:1")
+				So(upstream.Address, ShouldEqual, "2.2.2.2:1")
 			})
 		})
 	})
@@ -576,23 +821,25 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 2 registered apis both over used", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 3.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							limiter: rate.NewLimiter(rate.Limit(0), 0),
+				"main": {
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 3.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								limiter: rate.NewLimiter(rate.Limit(0), 0),
+							},
 						},
 					},
-				},
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 2.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							limiter: rate.NewLimiter(rate.Limit(0), 0),
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 2.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								limiter: rate.NewLimiter(rate.Limit(0), 0),
+							},
 						},
 					},
 				},
@@ -608,7 +855,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldNotBeNil)
 				So(err, ShouldEqual, gateway.ErrUpstreamerTooManyRequests)
-				So(upstream, ShouldEqual, "")
+				So(upstream.Address, ShouldEqual, "")
 			})
 		})
 	})
@@ -616,20 +863,22 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 2 registered apis both the least loaded over used", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 1.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							limiter: rate.NewLimiter(rate.Limit(0), 0),
+				"main": {
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 1.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								limiter: rate.NewLimiter(rate.Limit(0), 0),
+							},
 						},
 					},
-				},
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 10.0,
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 10.0,
+					},
 				},
 			},
 		}
@@ -642,7 +891,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldEqual, "1.1.1.1:1")
+				So(upstream.Address, ShouldEqual, "1.1.1.1:1")
 			})
 		})
 	})
@@ -650,20 +899,22 @@ func TestUpstreamUpstreamer(t *testing.T) {
 	Convey("Given I have an upstreamer with 2 registered apis both the most loaded over used", t, func() {
 
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:  "2.2.2.2:1",
-					lastLoad: 10.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							limiter: rate.NewLimiter(rate.Limit(0), 0),
+				"main": {
+					{
+						address:  "2.2.2.2:1",
+						lastLoad: 10.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								limiter: rate.NewLimiter(rate.Limit(0), 0),
+							},
 						},
 					},
-				},
-				{
-					address:  "1.1.1.1:1",
-					lastLoad: 1.0,
+					{
+						address:  "1.1.1.1:1",
+						lastLoad: 1.0,
+					},
 				},
 			},
 		}
@@ -676,7 +927,7 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(upstream, ShouldEqual, "1.1.1.1:1")
+				So(upstream.Address, ShouldEqual, "1.1.1.1:1")
 			})
 		})
 	})
@@ -685,29 +936,31 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 		now := time.Now()
 		u := NewUpstreamer(nil, "topic", "topic2", opt)
-		u.apis = map[string][]*endpointInfo{
+		u.apis = map[string]map[string][]*endpointInfo{
 			"/cats": {
-				{
-					address:           "2.2.2.2:1",
-					lastLoad:          10.0,
-					lastLimiterAdjust: now.Add(-time.Hour),
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							Limit:   rate.Limit(10.0),
-							Burst:   30,
-							limiter: rate.NewLimiter(rate.Limit(10.0), 30),
+				"main": {
+					{
+						address:           "2.2.2.2:1",
+						lastLoad:          10.0,
+						lastLimiterAdjust: now.Add(-time.Hour),
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								Limit:   rate.Limit(10.0),
+								Burst:   30,
+								limiter: rate.NewLimiter(rate.Limit(10.0), 30),
+							},
 						},
 					},
-				},
-				{
-					address:           "1.1.1.1:1",
-					lastLimiterAdjust: now.Add(-time.Hour),
-					lastLoad:          1.0,
-					limiters: IdentityToAPILimitersRegistry{
-						"cats": &APILimiter{
-							Limit:   rate.Limit(100.0),
-							Burst:   300,
-							limiter: rate.NewLimiter(rate.Limit(100.0), 300),
+					{
+						address:           "1.1.1.1:1",
+						lastLimiterAdjust: now.Add(-time.Hour),
+						lastLoad:          1.0,
+						limiters: IdentityToAPILimitersRegistry{
+							"cats": &APILimiter{
+								Limit:   rate.Limit(100.0),
+								Burst:   300,
+								limiter: rate.NewLimiter(rate.Limit(100.0), 300),
+							},
 						},
 					},
 				},
@@ -724,13 +977,13 @@ func TestUpstreamUpstreamer(t *testing.T) {
 
 			Convey("Then upstream should be correct", func() {
 				So(err, ShouldBeNil)
-				So(u.apis["/cats"][0].limiters["cats"].limiter.Limit(), ShouldAlmostEqual, rate.Limit(1.0))
-				So(u.apis["/cats"][0].limiters["cats"].limiter.Burst(), ShouldEqual, 3)
-				So(u.apis["/cats"][0].lastLimiterAdjust.Round(time.Second), ShouldEqual, now.Round(time.Second))
+				So(u.apis["/cats"]["main"][0].limiters["cats"].limiter.Limit(), ShouldAlmostEqual, rate.Limit(1.0))
+				So(u.apis["/cats"]["main"][0].limiters["cats"].limiter.Burst(), ShouldEqual, 3)
+				So(u.apis["/cats"]["main"][0].lastLimiterAdjust.Round(time.Second), ShouldEqual, now.Round(time.Second))
 
-				So(u.apis["/cats"][1].limiters["cats"].limiter.Limit(), ShouldAlmostEqual, rate.Limit(10.0))
-				So(u.apis["/cats"][1].limiters["cats"].limiter.Burst(), ShouldEqual, 30)
-				So(u.apis["/cats"][1].lastLimiterAdjust.Round(time.Second), ShouldEqual, now.Round(time.Second))
+				So(u.apis["/cats"]["main"][1].limiters["cats"].limiter.Limit(), ShouldAlmostEqual, rate.Limit(10.0))
+				So(u.apis["/cats"]["main"][1].limiters["cats"].limiter.Burst(), ShouldEqual, 30)
+				So(u.apis["/cats"]["main"][1].lastLimiterAdjust.Round(time.Second), ShouldEqual, now.Round(time.Second))
 			})
 		})
 	})

@@ -19,8 +19,10 @@ type Notifier struct {
 	hiddenAPIs         map[string]bool
 	serviceName        string
 	endpoint           string
+	foreignEndpoint    string
 	serviceStatusTopic string
 	prefix             string
+	region             string
 	frequency          time.Duration
 }
 
@@ -42,10 +44,12 @@ func NewNotifier(
 		pubsub:             pubsub,
 		serviceName:        serviceName,
 		endpoint:           endpoint,
+		foreignEndpoint:    cfg.foreignEndpoint,
 		serviceStatusTopic: serviceStatusTopic,
 		limiters:           cfg.rateLimits,
 		frequency:          cfg.pingInterval,
 		prefix:             cfg.prefix,
+		region:             cfg.region,
 		privateOverrides:   cfg.privateOverrides,
 		hiddenAPIs:         cfg.hiddenAPIs,
 	}
@@ -81,14 +85,16 @@ func (w *Notifier) MakeStartHook(ctx context.Context) func(server bahamut.Server
 		}
 
 		sp := servicePing{
-			Name:         w.serviceName,
-			Prefix:       w.prefix,
-			Status:       entityStatusHello,
-			Endpoint:     w.endpoint,
-			Routes:       routes,
-			Versions:     server.VersionsInfo(),
-			PushEndpoint: server.PushEndpoint(),
-			APILimiters:  w.limiters,
+			Name:            w.serviceName,
+			Prefix:          w.prefix,
+			Region:          w.region,
+			Status:          entityStatusHello,
+			Endpoint:        w.endpoint,
+			ForeignEndpoint: w.foreignEndpoint,
+			Routes:          routes,
+			Versions:        server.VersionsInfo(),
+			PushEndpoint:    server.PushEndpoint(),
+			APILimiters:     w.limiters,
 		}
 
 		pct, err := p.CPUPercent()
@@ -147,10 +153,12 @@ func (w *Notifier) MakeStopHook() func(server bahamut.Server) error {
 
 		pub := bahamut.NewPublication(w.serviceStatusTopic)
 		if err := pub.Encode(servicePing{
-			Name:     w.serviceName,
-			Prefix:   w.prefix,
-			Status:   entityStatusGoodbye,
-			Endpoint: w.endpoint,
+			Name:            w.serviceName,
+			Prefix:          w.prefix,
+			Region:          w.region,
+			Status:          entityStatusGoodbye,
+			Endpoint:        w.endpoint,
+			ForeignEndpoint: w.foreignEndpoint,
 		}); err != nil {
 			return err
 		}
