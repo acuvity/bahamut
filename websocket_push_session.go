@@ -321,7 +321,11 @@ func (s *wsPushSession) listen() {
 				err,
 			)
 
-		case <-s.conn.Done():
+		case err := <-s.conn.Done():
+			slog.Debug("Websocket closed",
+				"session", s.id,
+				"err", err,
+			)
 			return
 
 		case <-s.ctx.Done():
