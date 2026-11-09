@@ -326,7 +326,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessCreate function", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}, "secret": "can't see me"}`)
 
 		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
@@ -363,7 +363,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}}`)
 		ctx := newContext(context.Background(), request)
 
 		auditer := &mockAuditer{}
@@ -468,7 +468,7 @@ func TestDispatchers_dispatchCreateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessCreate function with error", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}}`)
 
 		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
@@ -690,7 +690,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessUpdate function", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}, "secret": "can't see me"}`)
 
 		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
@@ -726,7 +726,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}}`)
 		ctx := newContext(context.Background(), request)
 
 		auditer := &mockAuditer{}
@@ -830,7 +830,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessUpdate function with error", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}}`)
 
 		processorFinder := func(_ elemental.Identity) (Processor, error) { // nolint: unparam
 			return &mockProcessor{
@@ -1051,7 +1051,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessUpdate function and uses an elementalRetriever that works", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}, "secret": "can't see me"}`)
 
 		expectedID := "a"
 
@@ -1097,7 +1097,7 @@ func TestDispatchers_dispatchUpdateOperation(t *testing.T) {
 	Convey("Given I have a processor that handle ProcessUpdate function and has an elementalRetriever but disables retrieve on update", t, func() {
 		request := elemental.NewRequest()
 		request.Identity = testmodel.ListIdentity
-		request.Data = []byte(`{"ID": "1234", "name": "Fake", "secret": "can't see me"}`)
+		request.Data = []byte(`{"ID": "1234", "name": "Fake", "ref": {"name": "Fake"}, "secret": "can't see me"}`)
 
 		expectedID := "a"
 

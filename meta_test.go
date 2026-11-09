@@ -73,6 +73,15 @@ func Test_buildVersionedRoutes(t *testing.T) {
 						},
 					},
 					{
+						URL:      "/subtasks/:id",
+						Identity: "subtasks",
+						Verbs: []string{
+							"DELETE",
+							"GET",
+							"PUT",
+						},
+					},
+					{
 						URL:      "/tasks",
 						Identity: "tasks",
 						Verbs: []string{
@@ -137,6 +146,15 @@ func Test_buildVersionedRoutes(t *testing.T) {
 						Identity: "users",
 						Verbs: []string{
 							"GET",
+						},
+					},
+					{
+						URL:      "/subtasks/:id",
+						Identity: "subtasks",
+						Verbs: []string{
+							"DELETE",
+							"GET",
+							"PUT",
 						},
 					},
 					{
