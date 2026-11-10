@@ -15,6 +15,7 @@ const CORSOriginMirror = "_mirror_"
 // CORS Access Control header of a response.
 type CORSPolicy struct {
 	additionalOrigins map[string]struct{}
+	wildcardSuffixes  []string
 	AllowOrigin       string
 	AllowHeaders      []string
 	AllowMethods      []string
@@ -32,15 +33,18 @@ type corsPolicyController struct {
 //
 // additionalOrigins is the set of origins (beyond origin) that are allowed to
 // be mirrored back in Access-Control-Allow-Origin. Entries may be either exact
-// origins (e.g. "https://app.foo.bar") or single-label wildcards of the form
-// "*.foo.bar": "*.foo.bar" matches "a.foo.bar" but not "a.b.foo.bar".
+// origins (e.g. "https://app.foo.bar") or wildcards of the form "*.foo.bar".
+// "*.foo.bar" matches any number of labels before ".foo.bar".
 // Note: this is not glob matching; the wildcard only works as a leading
-// single-label prefix ("*.domain") and is not a general pattern.
+// prefix ("*.domain") and is not a general pattern.
 func NewDefaultCORSController(origin string, additionalOrigins []string) CORSPolicyController {
 
-	additionalOriginsMap := make(map[string]struct{}, len(additionalOrigins))
-	if len(additionalOrigins) > 0 {
-		for _, o := range additionalOrigins {
+	additionalOriginsMap := map[string]struct{}{}
+	var wildcardSuffixes []string
+	for _, o := range additionalOrigins {
+		if strings.HasPrefix(o, "*.") {
+			wildcardSuffixes = append(wildcardSuffixes, o[1:])
+		} else {
 			additionalOriginsMap[o] = struct{}{}
 		}
 	}
@@ -49,6 +53,7 @@ func NewDefaultCORSController(origin string, additionalOrigins []string) CORSPol
 		policy: &CORSPolicy{
 			AllowOrigin:       origin,
 			additionalOrigins: additionalOriginsMap,
+			wildcardSuffixes:  wildcardSuffixes,
 			AllowCredentials:  true,
 			MaxAge:            1500,
 			AllowHeaders: []string{
@@ -95,13 +100,11 @@ func (c *corsPolicyController) PolicyForRequest(*http.Request) *CORSPolicy {
 	return c.policy
 }
 
-// matchesAdditional reports whether the given origin matches any entry in
-// additionalOrigins. Entries are either exact strings or single-label
-// wildcards of the form "*.foo.bar" (TLS-style): "*.foo.bar" matches
-// "a.foo.bar" but not "a.b.foo.bar". Lookup is O(1): at most two map lookups.
+// matchesAdditional reports whether origin is an exact additional origin or
+// ends with a wildcard suffix.
 func (a *CORSPolicy) matchesAdditional(origin string) bool {
 
-	if origin == "" || len(a.additionalOrigins) == 0 {
+	if origin == "" {
 		return false
 	}
 
@@ -109,12 +112,13 @@ func (a *CORSPolicy) matchesAdditional(origin string) bool {
 		return true
 	}
 
-	i := strings.IndexByte(origin, '.')
-	if i < 0 {
-		return false
+	for _, s := range a.wildcardSuffixes {
+		if strings.HasSuffix(origin, s) {
+			return true
+		}
 	}
-	_, ok := a.additionalOrigins["*"+origin[i:]]
-	return ok
+
+	return false
 }
 
 // Inject injects the CORS header on the given http.Header. It will use

@@ -139,7 +139,7 @@ func TestCORSInject(t *testing.T) {
 
 		h = http.Header{}
 		ac.Inject(h, "a.b.foo.bar", false)
-		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "origin")
+		So(h.Get("Access-Control-Allow-Origin"), ShouldEqual, "a.b.foo.bar")
 
 		h = http.Header{}
 		ac.Inject(h, "https://a.foo.bar", false)
