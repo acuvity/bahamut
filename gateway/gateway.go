@@ -47,8 +47,10 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		o(cfg)
 	}
 
-	cfg.corsController = bahamut.NewDefaultCORSController(cfg.corsOrigin, cfg.additionalCorsOrigin)
-	cfg.corsController.PolicyForRequest(nil).AllowCredentials = cfg.corsAllowCredentials
+	if cfg.corsController == nil {
+		cfg.corsController = bahamut.NewDefaultCORSController(cfg.corsOrigin, cfg.additionalCorsOrigin)
+		cfg.corsController.PolicyForRequest(nil).AllowCredentials = cfg.corsAllowCredentials
+	}
 
 	var contradictory []string
 	for identity := range cfg.identityBufferLimits {

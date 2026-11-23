@@ -213,6 +213,13 @@ func Test_Options(t *testing.T) {
 		So(c.corsAllowCredentials, ShouldBeFalse)
 	})
 
+	Convey("Calling OptionCORSAccessControl should work", t, func() {
+		c := newGatewayConfig()
+		controller := bahamut.NewDefaultCORSController("dog", nil)
+		OptionCORSAccessControl(controller)(c)
+		So(c.corsController, ShouldEqual, controller)
+	})
+
 	Convey("Calling OptionTCPGlobalRateLimitingManager should work", t, func() {
 		c := newGatewayConfig()
 		m := &fakeListenerLimiterMetricManager{}

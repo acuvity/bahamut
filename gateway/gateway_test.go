@@ -48,6 +48,17 @@ func (u *simpleUpstreamer) CollectLatency(address string, rt time.Duration) {
 	// noop
 }
 
+type simpleCORSController struct {
+	allowed string
+}
+
+func (c *simpleCORSController) PolicyForRequest(r *http.Request) *bahamut.CORSPolicy {
+	if r.Header.Get("Origin") != c.allowed {
+		return &bahamut.CORSPolicy{}
+	}
+	return &bahamut.CORSPolicy{AllowOrigin: c.allowed}
+}
+
 type fakeMetricManager struct {
 	registerWSConnectionCalled    atomic.Int64
 	unregisterWSConnectionCalled  atomic.Int64
@@ -292,6 +303,52 @@ func TestGateway(t *testing.T) {
 				So(resp.StatusCode, ShouldEqual, 601)
 				So(resp.Header.Get("inject"), ShouldEqual, "hello")
 				So(resp.Header.Get("from-response"), ShouldEqual, "hello")
+			})
+		})
+
+		Convey("When I start the gateway with a CORS access controller", func() {
+
+			gw, err := New(
+				"127.0.0.1:7765",
+				u,
+				OptionUpstreamTLSConfig(&tls.Config{InsecureSkipVerify: true}),
+				OptionAllowedCORSOrigin(bahamut.CORSOriginMirror),
+				OptionCORSAccessControl(&simpleCORSController{allowed: "https://allowed"}),
+			)
+			defer gw.Stop()
+
+			So(err, ShouldBeNil)
+			So(gw, ShouldNotBeNil)
+
+			testclient := &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
+				},
+			}
+
+			gw.Start()
+
+			Convey("Then calling a OPTION from an allowed origin will return the origin", func() {
+				req, _ := http.NewRequest(http.MethodOptions, "http://127.0.0.1:7765/ups1", nil)
+				req.Header.Set("Origin", "https://allowed")
+				resp, err := testclient.Do(req)
+				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
+				So(resp.StatusCode, ShouldEqual, 200)
+				So(resp.Header.Get("Access-Control-Allow-Origin"), ShouldEqual, "https://allowed")
+				So(resp.Header.Get("Access-Control-Allow-Credentials"), ShouldBeEmpty)
+			})
+
+			Convey("Then calling a OPTION from another origin will return no origin", func() {
+				req, _ := http.NewRequest(http.MethodOptions, "http://127.0.0.1:7765/ups1", nil)
+				req.Header.Set("Origin", "https://other")
+				resp, err := testclient.Do(req)
+				So(err, ShouldBeNil)
+				defer func() { _ = resp.Body.Close() }()
+				So(resp.StatusCode, ShouldEqual, 200)
+				So(resp.Header.Get("Access-Control-Allow-Origin"), ShouldBeEmpty)
 			})
 		})
 

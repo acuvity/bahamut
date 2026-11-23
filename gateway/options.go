@@ -396,6 +396,14 @@ func OptionCORSAllowCredentials(allow bool) Option {
 	}
 }
 
+// OptionCORSAccessControl sets the controller that decides the CORS policy
+// of each request. When set, the other CORS options are ignored.
+func OptionCORSAccessControl(controller bahamut.CORSPolicyController) Option {
+	return func(cfg *gwconfig) {
+		cfg.corsController = controller
+	}
+}
+
 // OptionTrustForwardHeader configures if the gateway should strip
 // the X-Forwarded-For header or not.
 func OptionTrustForwardHeader(trust bool) Option {
