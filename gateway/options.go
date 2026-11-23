@@ -67,6 +67,7 @@ type gwconfig struct {
 	identityBufferLimits               map[string]bufferLimits
 	bufferRequestLimitsSet             bool
 	metricsManager                     bahamut.MetricsManager
+	corsController                     bahamut.CORSPolicyController
 	sourceRateLimitingMetricManager    LimiterMetricManager
 	sourceRateExtractor                RateExtractor
 	tcpGlobalRateLimitingMetricManager LimiterMetricManager

@@ -47,6 +47,9 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 		o(cfg)
 	}
 
+	cfg.corsController = bahamut.NewDefaultCORSController(cfg.corsOrigin, cfg.additionalCorsOrigin)
+	cfg.corsController.PolicyForRequest(nil).AllowCredentials = cfg.corsAllowCredentials
+
 	var contradictory []string
 	for identity := range cfg.identityBufferLimits {
 		if _, ok := cfg.streamingIdentities[identity]; ok {
@@ -152,14 +155,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 	}
 
 	s.corsOriginInjectorFunc = func(w http.ResponseWriter, r *http.Request) http.Header {
-		return injectCORSHeader(
-			w.Header(),
-			cfg.corsOrigin,
-			cfg.additionalCorsOrigin,
-			cfg.corsAllowCredentials,
-			r.Header.Get("origin"),
-			r.Method,
-		)
+		return injectCORSHeader(w.Header(), cfg.corsController, r)
 	}
 
 	var (
@@ -197,14 +193,7 @@ func New(listenAddr string, upstreamer Upstreamer, options ...Option) (Gateway, 
 			return nil
 		}
 
-		injectCORSHeader(
-			resp.Header,
-			cfg.corsOrigin,
-			cfg.additionalCorsOrigin,
-			cfg.corsAllowCredentials,
-			resp.Request.Header.Get("origin"),
-			resp.Request.Method,
-		)
+		injectCORSHeader(resp.Header, cfg.corsController, resp.Request)
 
 		if s.gatewayConfig.responseRewriter != nil {
 			if err := s.gatewayConfig.responseRewriter(resp); err != nil {
@@ -406,14 +395,7 @@ func (s *gateway) checkInterceptor(
 		}
 
 		return interceptor(w, r, writeError, func() {
-			injectCORSHeader(
-				w.Header(),
-				cfg.corsOrigin,
-				cfg.additionalCorsOrigin,
-				cfg.corsAllowCredentials,
-				r.Header.Get("origin"),
-				r.Method,
-			)
+			injectCORSHeader(w.Header(), cfg.corsController, r)
 		})
 	}
 
@@ -425,15 +407,7 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	injectGeneralHeader(w.Header())
 
 	if r.Method == http.MethodOptions {
-		h := w.Header()
-		injectCORSHeader(
-			h,
-			s.gatewayConfig.corsOrigin,
-			s.gatewayConfig.additionalCorsOrigin,
-			s.gatewayConfig.corsAllowCredentials,
-			r.Header.Get("Origin"),
-			r.Method,
-		)
+		injectCORSHeader(w.Header(), s.gatewayConfig.corsController, r)
 		w.WriteHeader(http.StatusOK) // nolint: errcheck
 		return
 	}
@@ -441,14 +415,7 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.gatewayConfig.maintenance {
 		h := w.Header()
 		h.Set("Content-Type", "application/msgpack, application/json")
-		injectCORSHeader(
-			h,
-			s.gatewayConfig.corsOrigin,
-			s.gatewayConfig.additionalCorsOrigin,
-			s.gatewayConfig.corsAllowCredentials,
-			r.Header.Get("Origin"),
-			r.Method,
-		)
+		injectCORSHeader(h, s.gatewayConfig.corsController, r)
 		writeError(w, r, errLocked)
 		return
 	}
@@ -462,14 +429,7 @@ func (s *gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, interceptor := range s.gatewayConfig.interceptors {
 		interceptAction, upstream, err = interceptor(w, r, writeError, func() {
-			injectCORSHeader(
-				w.Header(),
-				s.gatewayConfig.corsOrigin,
-				s.gatewayConfig.additionalCorsOrigin,
-				s.gatewayConfig.corsAllowCredentials,
-				r.Header.Get("origin"),
-				r.Method,
-			)
+			injectCORSHeader(w.Header(), s.gatewayConfig.corsController, r)
 		})
 		if interceptAction != 0 {
 			goto HANDLE_INTERCEPTION
@@ -511,14 +471,7 @@ HANDLE_INTERCEPTION:
 	if interceptAction == InterceptorActionStop {
 		// This has no incidence if the interceptor already wrote the header.
 		// In such case caller must call the corsInjector by himself.
-		injectCORSHeader(
-			w.Header(),
-			s.gatewayConfig.corsOrigin,
-			s.gatewayConfig.additionalCorsOrigin,
-			s.gatewayConfig.corsAllowCredentials,
-			r.Header.Get("Origin"),
-			r.Method,
-		)
+		injectCORSHeader(w.Header(), s.gatewayConfig.corsController, r)
 		return
 	}
 

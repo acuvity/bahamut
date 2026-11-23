@@ -3,6 +3,7 @@ package gateway
 import (
 	"crypto/tls"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 	"time"
@@ -216,7 +217,13 @@ func Test_injectCORSHeader(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := injectCORSHeader(tt.args.h, tt.args.corsOrigin, tt.args.additionalCorsOrigin, tt.args.corsAllowCredentials, tt.args.origin, tt.args.method); !reflect.DeepEqual(got, tt.want) {
+			r := httptest.NewRequest(tt.args.method, "/", nil)
+			if tt.args.origin != "" {
+				r.Header.Set("Origin", tt.args.origin)
+			}
+			controller := bahamut.NewDefaultCORSController(tt.args.corsOrigin, tt.args.additionalCorsOrigin)
+			controller.PolicyForRequest(nil).AllowCredentials = tt.args.corsAllowCredentials
+			if got := injectCORSHeader(tt.args.h, controller, r); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("injectCORSHeader() = \ngot:  %v\nwant: %v", got, tt.want)
 			}
 		})

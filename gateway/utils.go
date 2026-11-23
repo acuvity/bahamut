@@ -21,12 +21,9 @@ func injectGeneralHeader(h http.Header) http.Header {
 	return h
 }
 
-func injectCORSHeader(h http.Header, corsOrigin string, additionalCorsOrigin []string, allowCredentials bool, origin string, method string) http.Header {
+func injectCORSHeader(h http.Header, controller bahamut.CORSPolicyController, r *http.Request) http.Header {
 
-	a := bahamut.NewDefaultCORSController(corsOrigin, additionalCorsOrigin)
-	ac := a.PolicyForRequest(nil)
-	ac.AllowCredentials = allowCredentials
-	ac.Inject(h, origin, method == http.MethodOptions)
+	controller.PolicyForRequest(r).Inject(h, r.Header.Get("Origin"), r.Method == http.MethodOptions)
 	return h
 }
 
