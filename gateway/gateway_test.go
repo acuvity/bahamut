@@ -301,6 +301,7 @@ func TestGateway(t *testing.T) {
 				"127.0.0.1:7765",
 				u,
 				OptionUpstreamTLSConfig(&tls.Config{InsecureSkipVerify: true}),
+				OptionAdditionnalAllowedCORSOrigin([]string{"orig"}),
 				OptionRegisterExactInterceptor("/hello", func(w http.ResponseWriter, req *http.Request, ew ErrorWriter, corsInjector func()) (InterceptorAction, string, error) {
 					corsInjector()
 					w.WriteHeader(604)

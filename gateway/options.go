@@ -115,7 +115,6 @@ type gwconfig struct {
 
 func newGatewayConfig() *gwconfig {
 	return &gwconfig{
-		corsOrigin:                  bahamut.CORSOriginMirror,
 		corsAllowCredentials:        true,
 		prefixInterceptors:          map[string]InterceptorFunc{},
 		suffixInterceptors:          map[string]InterceptorFunc{},
@@ -371,8 +370,6 @@ func OptionUpstreamTLSConfig(tlsConfig *tls.Config) Option {
 // whatever is set in the upcoming request Origin header.
 // This is not secure to be used in production
 // when a browser is calling the gateway.
-//
-// By default, it is set to CORSOriginMirror.
 func OptionAllowedCORSOrigin(origin string) Option {
 	return func(cfg *gwconfig) {
 		cfg.corsOrigin = origin
